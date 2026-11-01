@@ -1,0 +1,34 @@
+{
+  "siteName": "GhostSensix",
+  "brandPrefix": "Ghost",
+  "brandSuffix": "Sensix",
+  "siteTagline": "Premium Roblox Scripts & Live Exploit Status",
+  "unlockTasks": {
+    "youtubeChannelUrl": "https://www.youtube.com/@GhostSensix",
+    "youtubeChannelName": "@GhostSensix",
+    "affiliateUrl": "https://discord.gg/6MTUP78KF6",
+    "affiliateTitle": "Join GhostSensix Discord Community",
+    "latestVideoUrl": "https://www.youtube.com/watch?v=HVPqCzVCnQk",
+    "latestVideoTitle": "Like & Watch Latest Video",
+    "verificationSeconds": 5
+  },
+  "socialLinks": {
+    "youtube": "https://www.youtube.com/@GhostSensix",
+    "discord": "https://discord.gg/6MTUP78KF6"
+  },
+  "lootlabsGate": {
+    "provider": "shrinkme",
+    "shrinkmeUrl": "https://shrinkme.click/aZd1s",
+    "bypassMessage": "Please complete the sponsor check to unlock all scripts for 24 hours."
+  },
+  "firebaseConfig": {
+    "apiKey": "AIzaSyApTJf2qSiaaM3qQ9e2XE16Za1p3FGXpxI",
+    "authDomain": "blacklistscripts.firebaseapp.com",
+    "projectId": "blacklistscripts",
+    "storageBucket": "blacklistscripts.firebasestorage.app",
+    "messagingSenderId": "337802433479",
+    "appId": "1:337802433479:web:d0758311bfd6bd02983fe2",
+    "measurementId": "G-KJVSN73QYR"
+  }
+}
+
