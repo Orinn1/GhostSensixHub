@@ -433,3 +433,82 @@ body {
     }
 }
 
+/* ==========================================================================
+   HIGH-PERFORMANCE HARDWARE ACCELERATION & ZERO-LAG ENGINES
+   ========================================================================== */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #07040f !important;
+    background-image: radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.08) 0%, transparent 65%) !important;
+    background-attachment: scroll !important; /* Critical: eliminates full-screen repaint lag on scroll */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeSpeed;
+}
+
+/* Eliminate expensive backdrop-filters from high-frequency scrolling & animating elements */
+.executor-marquee-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #120c24 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid rgba(168, 85, 247, 0.22) !important;
+    contain: content;
+    transform: translateZ(0);
+}
+
+.executors-marquee-container {
+    mask-image: none !important; /* Critical: eliminates GPU offscreen alpha mask repaint on every frame */
+    -webkit-mask-image: none !important;
+    overflow: hidden !important;
+    contain: layout paint;
+}
+
+.executors-marquee-track {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+}
+
+.script-row, .script-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #110b24 !important;
+    border: 1px solid rgba(168, 85, 247, 0.22) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
+    contain: content;
+    transform: translateZ(0);
+}
+
+.script-row:hover, .script-card:hover {
+    background: #170f30 !important;
+    border-color: rgba(168, 85, 247, 0.5) !important;
+    box-shadow: 0 8px 24px rgba(168, 85, 247, 0.22) !important;
+}
+
+.script-row::before {
+    display: none !important; /* Remove expensive radial mouse tracking calculation */
+}
+
+.hero-spotlight {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(18, 12, 36, 0.96) !important;
+    contain: content;
+    transform: translateZ(0);
+}
+
+/* Smooth Navigation */
+.core-simple-navbar {
+    background: rgba(8, 5, 17, 0.94) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.core-bottom-nav {
+    background: rgba(8, 5, 17, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
