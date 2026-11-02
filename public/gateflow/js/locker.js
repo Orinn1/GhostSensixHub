@@ -373,7 +373,7 @@ function getTargetYoutubeUrl() {
   return 'https://www.youtube.com/@GhostSensix?sub_confirmation=1';
 }
 
-// Auto-fetch latest YouTube video in the background via Worker API
+// Auto-fetch latest YouTube video in real-time via Cloudflare Function or RSS feed
 async function fetchLatestVideo() {
   const params = new URLSearchParams(window.location.search);
   const customVideo = params.get('v') || params.get('video');
@@ -382,20 +382,51 @@ async function fetchLatestVideo() {
     return;
   }
 
-  const targetCh = params.get('ch') || params.get('yt') || 'GhostSensix';
-
+  // 1. Check local session cache for instant load
   try {
-    const res = await fetch(`/api/latest-video?ch=${encodeURIComponent(targetCh)}`);
+    const cached = sessionStorage.getItem('ghost_latest_video_url');
+    if (cached && cached.includes('watch?v=')) {
+      cachedLatestVideoUrl = cached;
+    }
+  } catch (e) {}
+
+  const channelId = 'UC8laKzbaWUNJMJ6XN_pxiBg';
+
+  // 2. Tier 1: Try Cloudflare Pages Function / local backend endpoint
+  try {
+    const res = await fetch('/api/latest-video', { signal: AbortSignal.timeout(3500) });
     if (res.ok) {
       const data = await res.json();
-      if (data && data.videoUrl) {
+      if (data && data.videoUrl && data.videoUrl.includes('watch?v=')) {
         cachedLatestVideoUrl = data.videoUrl;
+        try { sessionStorage.setItem('ghost_latest_video_url', data.videoUrl); } catch (e) {}
         return;
       }
     }
   } catch (e) {}
 
-  cachedLatestVideoUrl = 'https://www.youtube.com/watch?v=GTSVT1ax-jc';
+  // 3. Tier 2: Real-time public RSS-to-JSON gateway (always extracts latest upload automatically)
+  try {
+    const rssJsonUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(`https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`)}`;
+    const rssRes = await fetch(rssJsonUrl, { signal: AbortSignal.timeout(4500) });
+    if (rssRes.ok) {
+      const data = await rssRes.json();
+      if (data && data.status === 'ok' && Array.isArray(data.items) && data.items.length > 0) {
+        const latestItem = data.items[0];
+        const latestUrl = latestItem.link || (latestItem.guid ? `https://www.youtube.com/watch?v=${latestItem.guid.replace('yt:video:', '')}` : '');
+        if (latestUrl && latestUrl.includes('watch?v=')) {
+          cachedLatestVideoUrl = latestUrl;
+          try { sessionStorage.setItem('ghost_latest_video_url', latestUrl); } catch (e) {}
+          return;
+        }
+      }
+    }
+  } catch (e) {}
+
+  // 4. Fallback if offline
+  if (!cachedLatestVideoUrl) {
+    cachedLatestVideoUrl = 'https://www.youtube.com/watch?v=GTSVT1ax-jc';
+  }
 }
 
 // Helper: Get Target YouTube Video URL (Auto resolved from YouTube channel)
