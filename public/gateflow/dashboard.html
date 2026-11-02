@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แดชบอร์ดจัดการลิงก์ & สถิติคนกดผ่าน &mdash; GateFlow & BlackPass</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/gateflow/css/main.css">
+  <link rel="stylesheet" href="/gateflow/css/dashboard.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .cell-channel-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .badge-roblox {
+      background: rgba(239, 68, 68, 0.15);
+      color: #F87171;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+    .badge-ff {
+      background: rgba(168, 85, 247, 0.15);
+      color: #C084FC;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+    }
+    .rate-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .rate-high {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34D399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .rate-mid {
+      background: rgba(245, 158, 11, 0.15);
+      color: #FBBF24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .rate-low {
+      background: rgba(148, 163, 184, 0.15);
+      color: #94A3B8;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+    .btn-action-icon {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      width: 32px;
+      height: 32px;
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-action-icon:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFFFFF;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-action-edit:hover {
+      background: rgba(99, 102, 241, 0.25);
+      color: #818CF8;
+      border-color: rgba(99, 102, 241, 0.5);
+    }
+    .btn-action-delete:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: #F87171;
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10B981;
+      display: inline-block;
+      box-shadow: 0 0 10px #10B981;
+      animation: pulse-live 2s infinite ease-in-out;
+    }
+    @keyframes pulse-live {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon" style="width: 32px; height: 32px; background: linear-gradient(135deg, #6366F1, #38BDF8); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+            <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div>
+            <div style="font-size: 15px; font-weight: 800; line-height: 1.1;">GateFlow</div>
+            <div style="font-size: 10px; color: #38BDF8; font-weight: 700; letter-spacing: 0.5px;">CONTROL HUB</div>
+          </div>
+        </div>
+        <span class="sidebar-brand-badge" style="background: rgba(56, 189, 248, 0.15); color: #38BDF8; border-color: rgba(56, 189, 248, 0.3);">LIVE</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-section-title">เมนูระบบ & สถิติ</span>
+        <button class="sidebar-item active" data-view="overview">
+          <i data-lucide="layout-grid"></i>
+          <span>ภาพรวม & จัดการลิงก์</span>
+        </button>
+        <button class="sidebar-item" data-view="analytics">
+          <i data-lucide="bar-chart-2"></i>
+          <span>สถิติเชิงลึก & กราฟ</span>
+        </button>
+
+        <span class="nav-section-title">เครื่องมือ & ลิงก์</span>
+        <a href="/generator" target="_blank" class="sidebar-item" style="text-decoration: none;">
+          <i data-lucide="zap" style="color: #38BDF8;"></i>
+          <span>สร้างลิงก์ (Generator) ↗</span>
+        </a>
+        <a href="/access" target="_blank" class="sidebar-item" style="text-decoration: none;">
+          <i data-lucide="shield" style="color: #34D399;"></i>
+          <span>หน้าด่านหลัก (/access) ↗</span>
+        </a>
+
+        <span class="nav-section-title">ระบบ & รายได้</span>
+        <button class="sidebar-item" data-view="rates">
+          <i data-lucide="badge-dollar-sign"></i>
+          <span>เรท CPM & โฆษณา</span>
+        </button>
+        <button class="sidebar-item" data-view="settings">
+          <i data-lucide="sliders"></i>
+          <span>ตั้งค่าระบบ & Direct Ad</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-badge">
+          <div class="user-avatar" id="sidebarAvatar" style="background: linear-gradient(135deg, #ef4444, #8b5cf6); color: #fff;">BS</div>
+          <div class="user-info-text">
+            <span class="user-name" id="sidebarUsername">Admin / Creator</span>
+            <span class="user-tier" style="color: #34D399; display: flex; align-items: center; gap: 4px;">
+              <span class="live-dot"></span> Cloud Firestore
+            </span>
+          </div>
+          <button type="button" onclick="loadRealLockers()" title="รีเฟรชข้อมูล (Sync Now)" style="color: var(--text-muted); padding: 4px; background: none; border: none; cursor: pointer;">
+            <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <!-- Topbar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <h1 class="topbar-page-title" id="pageTitle">ภาพรวม & สถิติคนกดผ่าน</h1>
+        </div>
+
+        <div class="topbar-right">
+          <div class="balance-card-pill" style="border-color: rgba(56, 189, 248, 0.35); background: rgba(56, 189, 248, 0.08);">
+            <span class="balance-label" style="color: #38bdf8;">สถานะระบบ:</span>
+            <span class="balance-amount" style="color: #ffffff; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+              <span class="live-dot"></span> เชื่อมต่อ Realtime
+            </span>
+          </div>
+
+          <button class="btn btn-secondary btn-sm" onclick="loadRealLockers()" title="รีเฟรชข้อมูลจากฐานข้อมูล">
+            <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+            <span>รีเฟรชสถิติ</span>
+          </button>
+
+          <button class="btn btn-primary btn-sm" id="btnOpenCreateLocker" onclick="openCreateModal()">
+            <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+            <span>สร้างลิงก์ใหม่</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- View 1: Overview & Link Manager -->
+      <section class="dashboard-view active" id="viewOverview">
+        
+        <!-- 5 Key Metric Cards -->
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">ยอดคนกดเข้าทั้งหมด</span>
+              <div class="metric-icon"><i data-lucide="mouse-pointer" style="width: 14px; height: 14px;"></i></div>
+            </div>
+            <div class="metric-value" id="statTotalClicks">0</div>
+            <div class="metric-trend up">
+              <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+              <span id="trendClicksTxt">คนเข้าดูทุกด่านรวมกัน</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">ยอดคนกดผ่านสำเร็จ</span>
+              <div class="metric-icon"><i data-lucide="check-circle-2" style="width: 14px; height: 14px; color: #10B981;"></i></div>
+            </div>
+            <div class="metric-value" style="color: #10B981;" id="statTotalUnlocks">0</div>
+            <div class="metric-trend up">
+              <i data-lucide="shield-check" style="width: 14px; height: 14px; color: #10B981;"></i>
+              <span style="color: #10B981;">ทำภารกิจ 6 ข้อผ่านสำเร็จ</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">อัตราการผ่านสำเร็จ (Pass Rate)</span>
+              <div class="metric-icon"><i data-lucide="percent" style="width: 14px; height: 14px; color: #38BDF8;"></i></div>
+            </div>
+            <div class="metric-value" style="color: #38BDF8;" id="statConversion">0.0%</div>
+            <div class="metric-trend up">
+              <i data-lucide="trending-up" style="width: 14px; height: 14px; color: #38BDF8;"></i>
+              <span>อัตรา Unlock / Visit</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">จำนวนลิงก์ทั้งหมด</span>
+              <div class="metric-icon"><i data-lucide="link-2" style="width: 14px; height: 14px; color: #A855F7;"></i></div>
+            </div>
+            <div class="metric-value" style="color: #C084FC;" id="statTotalLinks">0</div>
+            <div class="metric-trend up">
+              <i data-lucide="layers" style="width: 14px; height: 14px;"></i>
+              <span>ลิงก์ที่สร้างไว้ในระบบ</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">ประมาณการรายได้โฆษณา</span>
+              <div class="metric-icon"><i data-lucide="dollar-sign" style="width: 14px; height: 14px; color: #F59E0B;"></i></div>
+            </div>
+            <div class="metric-value" style="color: #FBBF24;" id="statTotalRevenue">$0.00</div>
+            <div class="metric-trend up">
+              <i data-lucide="sparkles" style="width: 14px; height: 14px; color: #F59E0B;"></i>
+              <span>Monetag High CPM Yield</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Link Creator / Shortener -->
+        <div class="quick-shortener-card">
+          <div class="quick-shortener-header">
+            <div class="quick-shortener-title">
+              <i data-lucide="zap" style="color: #38BDF8; width: 20px; height: 20px;"></i>
+              <span>สร้างลิงก์กั้นใหม่ทันที (Quick Shortener)</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <a href="/generator" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration: none;">
+                <i data-lucide="external-link" style="width: 13px; height: 13px;"></i>
+                <span>เปิดหน้าสร้างขั้นสูง (Full Generator)</span>
+              </a>
+            </div>
+          </div>
+
+          <form id="quickShortenForm" class="quick-shortener-form" onsubmit="handleQuickShorten(event)">
+            <div class="quick-input-group">
+              <input type="text" id="quickTargetUrl" class="quick-input-url" placeholder="วางลิงก์ดาวน์โหลด (MediaFire/Drive) หรือวางโค้ดสคริปต์" required />
+              <input type="text" id="quickTitle" style="flex: 1; min-width: 140px; background: #0b1120; border: 1px solid var(--border-subtle); color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 13px;" placeholder="ชื่อสคริปต์ (เช่น Blox หรือ ฟีฟาย)" />
+              <input type="text" id="quickAlias" class="quick-input-alias" placeholder="ชื่อลิงก์สั้น (เช่น test, aim, ff)" pattern="[a-zA-Z0-9-_]+" />
+              <select id="quickChannel" style="background: #0b1120; border: 1px solid var(--border-subtle); color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
+                <option value="Blacklistxyx">🔴 @Blacklistxyx (Roblox)</option>
+                <option value="GhostSensix">🟣 @GhostSensix (Free Fire)</option>
+              </select>
+              <select id="quickAds" style="background: #0b1120; border: 1px solid var(--border-subtle); color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
+                <option value="1">⚡ 1 โฆษณา (เร็วสุด)</option>
+                <option value="2">⚖️ 2 โฆษณา (สมดุล)</option>
+                <option value="3" selected>🔥 3 โฆษณา (ปกติ)</option>
+                <option value="4">💰 4 โฆษณา (สูงสุด)</option>
+                <option value="0">🎁 0 โฆษณา (ฟรี)</option>
+              </select>
+              <button type="submit" class="btn btn-primary" id="btnQuickShorten">
+                <i data-lucide="scissors" style="width: 16px; height: 16px;"></i>
+                <span>สร้างลิงก์</span>
+              </button>
+            </div>
+          </form>
+
+          <div id="quickResultBox" class="quick-result-box" style="display: none;">
+            <div class="quick-result-url">
+              <i data-lucide="check-circle-2" style="color: #10B981; width: 18px; height: 18px; flex-shrink: 0;"></i>
+              <span id="quickGeneratedUrl"></span>
+            </div>
+            <div class="quick-result-actions">
+              <button type="button" class="btn btn-sm btn-primary" id="btnCopyQuickResult" onclick="copyQuickUrl()">
+                <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+                <span>คัดลอกลิงก์</span>
+              </button>
+              <a href="#" target="_blank" class="btn btn-sm btn-secondary" id="btnTestQuickResult">
+                <i data-lucide="external-link" style="width: 14px; height: 14px;"></i>
+                <span>ทดสอบเปิดดู</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-Time Link Management Table -->
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title-group">
+              <h3 class="table-title">รายการลิงก์และสถิติคนกดผ่านทั้งหมด (Live Link Manager)</h3>
+              <span class="badge badge-primary" id="lockerCountBadge">0 รายการ</span>
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <input type="text" class="table-search-input" id="searchLockersInput" placeholder="ค้นหาชื่อ, slug หรือช่อง..." oninput="handleSearchLockers(this.value)">
+              <button class="btn btn-secondary btn-sm" onclick="loadRealLockers()" title="รีเฟรชข้อมูล">
+                <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="min-width: 220px;">ชื่อหัวข้อ / ลิงก์สั้น</th>
+                  <th style="min-width: 150px;">ช่อง YouTube เป้าหมาย</th>
+                  <th style="min-width: 220px;">ปลายทางที่แจก (Target)</th>
+                  <th style="min-width: 90px; text-align: center;">คนคลิกเข้า</th>
+                  <th style="min-width: 100px; text-align: center;">ผ่านสำเร็จ</th>
+                  <th style="min-width: 120px; text-align: center;">อัตราผ่าน</th>
+                  <th style="min-width: 150px; text-align: right;">จัดการ / ตั้งค่า</th>
+                </tr>
+              </thead>
+              <tbody id="lockersTableBody">
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                      <i data-lucide="loader-2" class="spin" style="width: 28px; height: 28px; color: #38bdf8;"></i>
+                      <span>กำลังโหลดข้อมูลจาก Firestore...</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- View 2: Detailed Analytics & Performance -->
+      <section class="dashboard-view" id="viewAnalytics">
+        <div style="margin-bottom: 24px;">
+          <h2 style="font-size: 20px; font-weight: 700; color: #FFFFFF;">สถิติเชิงลึก & กราฟประสิทธิภาพ (Analytics)</h2>
+          <p style="font-size: 13px; color: var(--text-muted);">เปรียบเทียบสถิติการเข้าชม การปลดล็อกผ่านด่าน และประสิทธิภาพการทำงานของแต่ละช่อง</p>
+        </div>
+
+        <!-- Activity Chart Card -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <h3 class="chart-title">กราฟสถิติผู้เข้าชมและผู้ปลดล็อกผ่านด่าน</h3>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">คำนวณจากข้อมูลจริงของทุกช่องและทุกสคริปต์</p>
+            </div>
+            <div class="chart-actions">
+              <button class="chart-tab-btn active" data-chart-metric="clicks" onclick="switchChartMetric('clicks')">ยอดคลิกเข้า</button>
+              <button class="chart-tab-btn" data-chart-metric="unlocks" onclick="switchChartMetric('unlocks')">ยอดผ่านสำเร็จ</button>
+              <button class="chart-tab-btn" data-chart-metric="revenue" onclick="switchChartMetric('revenue')">ประมาณการรายได้ ($)</button>
+            </div>
+          </div>
+
+          <div class="chart-svg-container" id="chartContainer" style="height: 280px; display: flex; align-items: center; justify-content: center;">
+            <!-- Rendered by SVG engine -->
+          </div>
+        </div>
+
+        <!-- Breakdown by Channel -->
+        <div class="form-grid-2" style="margin-top: 20px;">
+          <div class="card" style="border: 1px solid rgba(239, 68, 68, 0.25); background: rgba(239, 68, 68, 0.04);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(239, 68, 68, 0.2); display: flex; align-items: center; justify-content: center; color: #EF4444;">
+                  <i data-lucide="youtube" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div>
+                  <h4 style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin: 0;">@Blacklistxyx (Roblox)</h4>
+                  <span style="font-size: 12px; color: var(--text-muted);">ช่องหลัก สคริปต์ Blox Fruits & Roblox</span>
+                </div>
+              </div>
+              <span class="badge badge-roblox">ROBLOX</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px;">
+              <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 8px;">
+                <div style="font-size: 11px; color: var(--text-muted);">คนกดเข้าช่องนี้</div>
+                <div style="font-size: 18px; font-weight: 800; color: #FFFFFF;" id="statRobloxClicks">0</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 8px;">
+                <div style="font-size: 11px; color: var(--text-muted);">คนกดผ่านสำเร็จ</div>
+                <div style="font-size: 18px; font-weight: 800; color: #10B981;" id="statRobloxUnlocks">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="border: 1px solid rgba(168, 85, 247, 0.25); background: rgba(168, 85, 247, 0.04);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(168, 85, 247, 0.2); display: flex; align-items: center; justify-content: center; color: #A855F7;">
+                  <i data-lucide="crosshair" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div>
+                  <h4 style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin: 0;">@GhostSensix (Free Fire)</h4>
+                  <span style="font-size: 12px; color: var(--text-muted);">ช่องพาแนล & สคริปต์ Free Fire ดึงหัว</span>
+                </div>
+              </div>
+              <span class="badge badge-ff">FREE FIRE</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px;">
+              <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 8px;">
+                <div style="font-size: 11px; color: var(--text-muted);">คนกดเข้าช่องนี้</div>
+                <div style="font-size: 18px; font-weight: 800; color: #FFFFFF;" id="statFfClicks">0</div>
+              </div>
+              <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 8px;">
+                <div style="font-size: 11px; color: var(--text-muted);">คนกดผ่านสำเร็จ</div>
+                <div style="font-size: 18px; font-weight: 800; color: #10B981;" id="statFfUnlocks">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View 3: CPM Rates & Monetization -->
+      <section class="dashboard-view" id="viewRates">
+        <div style="margin-bottom: 24px;">
+          <h2 style="font-size: 20px; font-weight: 700; color: #FFFFFF;">อัตราจ่าย CPM และระบบเครือข่าย Monetag Direct Links</h2>
+          <p style="font-size: 13px; color: var(--text-muted);">ข้อมูลอัตราค่าตอบแทนเฉลี่ยต่อ 1,000 คนเข้าชม (CPM) แยกตามประเทศ</p>
+        </div>
+
+        <div class="table-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ประเทศ / ภูมิภาค</th>
+                  <th>Tier กลุ่มเป้าหมาย</th>
+                  <th>เรท CPM เฉลี่ย</th>
+                  <th>สถานะรายได้</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong style="color: #fff;">🇹🇭 Thailand (ประเทศไทย)</strong></td>
+                  <td><span class="badge badge-primary">หลัก (YouTube / FF)</span></td>
+                  <td><strong style="color: #38BDF8; font-family: var(--font-mono);">$3.80 - $4.50</strong></td>
+                  <td><span class="rate-badge rate-high">เปิดใช้งาน 100%</span></td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #fff;">🇺🇸 United States &amp; Europe</strong></td>
+                  <td><span class="badge badge-primary">Tier 1 Global</span></td>
+                  <td><strong style="color: #38BDF8; font-family: var(--font-mono);">$6.50 - $12.00</strong></td>
+                  <td><span class="rate-badge rate-high">สูงสุด Tier 1</span></td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #fff;">🌐 ประเทศอื่นๆ ทั่วโลก</strong></td>
+                  <td><span class="badge badge-muted">Worldwide</span></td>
+                  <td><strong style="color: #38BDF8; font-family: var(--font-mono);">$2.20 - $3.50</strong></td>
+                  <td><span class="rate-badge rate-mid">ปกติ</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- View 4: System Settings -->
+      <section class="dashboard-view" id="viewSettings">
+        <div class="settings-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h3 class="settings-card-title" style="margin-bottom: 0;">ตั้งค่าลิงก์โฆษณา Monetag Direct Links</h3>
+            <button type="button" class="btn btn-primary btn-sm" onclick="saveMonetagSettings()">
+              <i data-lucide="save" style="width: 14px; height: 14px;"></i>
+              <span>บันทึกลิงก์โฆษณา</span>
+            </button>
+          </div>
+          <p class="settings-card-desc">คุณสามารถแก้ไขหรือนำลิงก์ Direct Link ใหม่จาก Monetag Dashboard มาใส่เพิ่มได้เลย ระบบจะนำไปหมุนเวียนแสดงตามรอบที่กำหนด</p>
+          
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 12px; color: #38bdf8;">Zone #1 (โฆษณารอบที่ 1):</label>
+              <input type="url" class="form-input" id="setAdLink1" value="https://uplcm.com/4/12169736" placeholder="https://uplcm.com/4/..." />
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 12px; color: #38bdf8;">Zone #2 (โฆษณารอบที่ 2):</label>
+              <input type="url" class="form-input" id="setAdLink2" value="https://uplcm.com/4/12157092" placeholder="https://uplcm.com/4/..." />
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 12px; color: #38bdf8;">Zone #3 (โฆษณารอบที่ 3):</label>
+              <input type="url" class="form-input" id="setAdLink3" value="https://uplcm.com/4/12157093" placeholder="https://uplcm.com/4/..." />
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 12px; color: #38bdf8;">Zone #4 (โฆษณารอบที่ 4 / โบนัสตอน Unlock):</label>
+              <input type="url" class="form-input" id="setAdLink4" value="https://uplcm.com/4/12157094" placeholder="https://uplcm.com/4/..." />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card" style="border: 1px solid rgba(56, 189, 248, 0.25);">
+          <h3 class="settings-card-title">วิธีนำลิงก์ไปติดในคลิป YouTube</h3>
+          <p class="settings-card-desc">แนะนำการวางลิงก์สั้นใต้คำอธิบายคลิป YouTube เพื่อให้ผู้ใช้เข้าถึงง่ายและทำภารกิจครบ 6 ข้อ</p>
+          <div style="background: rgba(0,0,0,0.4); border-radius: 8px; padding: 14px; margin-top: 10px; font-family: monospace; font-size: 12.5px; color: #CBD5E1; line-height: 1.6;">
+            <div>📥 ลิงก์ดาวน์โหลด/รับสคริปต์ในคลิปนี้:</div>
+            <div style="color: #38BDF8; font-weight: 700; margin: 4px 0;">👉 https://th.blacklisthub.workers.dev/l/ghost</div>
+            <div style="color: #94A3B8;">(ทำภารกิจ 6 ขั้นตอนเพื่อปลดล็อกและคัดลอกไฟล์/สคริปต์ฟรี)</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal: Edit Locker -->
+  <div class="modal-backdrop" id="editLockerModal">
+    <div class="modal-dialog" style="max-width: 580px;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="edit-3" style="width: 18px; height: 18px; color: #38bdf8;"></i>
+            <span>แก้ไขการตั้งค่า Locker</span>
+          </h3>
+          <span style="font-size: 12px; color: var(--text-muted);">
+            ลิงก์สั้น <code id="editSlugBadge" style="color: #38bdf8; background: rgba(56,189,248,0.1); padding: 2px 6px; border-radius: 4px;">/l/...</code> จะคงเดิม ไม่กระทบกับคลิป YouTube เดิมที่เคยแชร์
+          </span>
+        </div>
+        <button class="modal-close" onclick="closeEditModal()">
+          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+
+      <form id="editLockerForm" onsubmit="handleSaveEditLocker(event)">
+        <input type="hidden" id="editSlug">
+        
+        <div class="modal-body">
+          <!-- Mode Toggle -->
+          <div style="display: flex; gap: 8px; margin-bottom: 16px; background: rgba(255,255,255,0.04); padding: 4px; border-radius: 10px;">
+            <button type="button" id="editTabUrl" onclick="switchEditMode('url')" style="flex: 1; height: 36px; border-radius: 8px; border: none; background: #2563EB; color: #fff; font-weight: 700; font-size: 12.5px; cursor: pointer;">
+              📥 ลิงก์ดาวน์โหลด (MediaFire/Drive)
+            </button>
+            <button type="button" id="editTabScript" onclick="switchEditMode('script')" style="flex: 1; height: 36px; border-radius: 8px; border: none; background: transparent; color: #94A3B8; font-weight: 600; font-size: 12.5px; cursor: pointer;">
+              📋 แจกสคริปต์ (Script Code)
+            </button>
+          </div>
+
+          <!-- URL Input -->
+          <div class="form-group" id="editGrpUrl">
+            <label class="form-label">ลิงก์ดาวน์โหลดปลายทาง (MediaFire / Google Drive):</label>
+            <input type="url" class="form-input" id="editUrl" placeholder="https://www.mediafire.com/file/... หรือ Google Drive" />
+          </div>
+
+          <!-- Script Code Textarea -->
+          <div class="form-group" id="editGrpScript" style="display: none;">
+            <label class="form-label">โค้ดสคริปต์ที่ต้องการแจก (Script Code):</label>
+            <textarea class="form-input" id="editScript" style="height: 100px; font-family: monospace; font-size: 12px; resize: vertical;" placeholder='loadstring(game:HttpGet("..."))()'></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">ชื่อสคริปต์ / หัวข้อหน้าด่าน:</label>
+            <input type="text" class="form-input" id="editTitle" placeholder="เช่น แจกโปร Free Fire ล็อกหัว ล่าสุด" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">คำอธิบายใต้หัวข้อ (ไม่บังคับ):</label>
+            <input type="text" class="form-input" id="editDesc" placeholder="เช่น ทำภารกิจสนับสนุน 6 ขั้นตอนเพื่อปลดล็อก" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">ช่อง YouTube ที่ต้องการให้ผู้ใช้กดติดตาม:</label>
+            <select id="editChannel" class="form-input" style="background: #090e17; color: #ffffff;">
+              <option value="Blacklistxyx">🔴 @Blacklistxyx (ช่องหลัก - Roblox)</option>
+              <option value="GhostSensix">🟣 @GhostSensix (ช่อง Free Fire / พาแนล)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">จำนวนรอบโฆษณา Monetag (ความยากง่ายของด่าน):</label>
+            <select id="editAds" class="form-input" style="background: #090e17; color: #ffffff;">
+              <option value="1">⚡ 1 รอบ (เร็วสุด - 4 ภารกิจรวม: 3 YouTube + 1 โฆษณา)</option>
+              <option value="2">⚖️ 2 รอบ (สมดุล - 5 ภารกิจรวม: 3 YouTube + 2 โฆษณา)</option>
+              <option value="3">🔥 3 รอบ (มาตรฐานเดิม - 6 ภารกิจรวม: 3 YouTube + 3 โฆษณา)</option>
+              <option value="4">💰 4 รอบ (ฟาร์มรายได้จัดเต็ม - 7 ภารกิจรวม: 3 YouTube + 4 โฆษณา)</option>
+              <option value="0">🎁 0 รอบ (ฟรี 100% ไม่มีโฆษณา - 3 ภารกิจ YouTube เท่านั้น)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeEditModal()">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveEdit">
+            <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+            <span>บันทึกการเปลี่ยนแปลง</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Create New Locker -->
+  <div class="modal-backdrop" id="createLockerModal">
+    <div class="modal-dialog" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 class="modal-title">สร้าง Content Locker ใหม่</h3>
+        <button class="modal-close" onclick="closeCreateModal()">
+          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+
+      <form id="createLockerForm" onsubmit="handleCreateModalSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">ลิงก์ดาวน์โหลด (MediaFire / Drive) หรือ โค้ดสคริปต์ *</label>
+            <input type="text" class="form-input" id="inputDestinationUrl" placeholder="https://www.mediafire.com/file/... หรือ ลิงก์ดาวน์โหลด" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">ชื่อ Locker (สำหรับแสดงผล)</label>
+              <input type="text" class="form-input" id="inputLockerName" placeholder="เช่น Blox Fruits v4.9 หรือ FF Panel">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">ชื่อลิงก์สั้น (Slug)</label>
+              <input type="text" class="form-input" id="inputLockerSlug" placeholder="เช่น blox หรือ ff (เว้นว่าง = สุ่ม)">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">ช่อง YouTube ที่ให้ผู้ใช้กดติดตาม:</label>
+            <select id="inputLockerChannel" class="form-input" style="background: #090e17; color: #ffffff;">
+              <option value="Blacklistxyx">🔴 @Blacklistxyx (Roblox)</option>
+              <option value="GhostSensix">🟣 @GhostSensix (Free Fire)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">จำนวนรอบโฆษณา Monetag:</label>
+            <select id="inputLockerAds" class="form-input" style="background: #090e17; color: #ffffff;">
+              <option value="1">⚡ 1 รอบ (เร็วสุด - 4 ภารกิจรวม: 3 YouTube + 1 โฆษณา)</option>
+              <option value="2">⚖️ 2 รอบ (สมดุล - 5 ภารกิจรวม: 3 YouTube + 2 โฆษณา)</option>
+              <option value="3" selected>🔥 3 รอบ (มาตรฐานเดิม - 6 ภารกิจรวม: 3 YouTube + 3 โฆษณา)</option>
+              <option value="4">💰 4 รอบ (ฟาร์มรายได้จัดเต็ม - 7 ภารกิจรวม: 3 YouTube + 4 โฆษณา)</option>
+              <option value="0">🎁 0 รอบ (ฟรี 100% ไม่มีโฆษณา - 3 ภารกิจ YouTube เท่านั้น)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeCreateModal()">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitCreate">
+            <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+            <span>สร้างและเปิดใช้งาน</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Delete Confirmation -->
+  <div class="modal-backdrop" id="deleteModal">
+    <div class="modal-dialog" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: #F87171; display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="alert-triangle" style="width: 18px; height: 18px;"></i>
+          <span>ยืนยันการลบ Locker?</span>
+        </h3>
+        <button class="modal-close" onclick="closeDeleteModal()">
+          <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+          คุณแน่ใจหรือไม่ว่าต้องการลบ Locker <code id="deleteSlugTarget" style="color: #F87171; font-weight: 700;"></code> ออกจากระบบ? ผู้ใช้ที่คลิกลิงก์นี้จะไม่สามารถเข้าถึงไฟล์ได้อีก
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeDeleteModal()">ยกเลิก</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmDelete" onclick="confirmDeleteLocker()">
+          <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+          <span>ยืนยันการลบ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px;"></div>
+
+  <script src="/gateflow/js/dashboard.js"></script>
+</body>
+</html>

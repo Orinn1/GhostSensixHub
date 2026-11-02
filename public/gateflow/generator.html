@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="monetag" content="006f5ad39e692eb6afe28008d13ae710">
+  <title>GateFlow Link Generator &mdash; เครื่องมือสร้างลิงก์กั้นโฆษณา</title>
+  
+
+  <!-- Google Fonts: Kanit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/gateflow/css/main.css">
+  <link rel="stylesheet" href="/gateflow/css/locker.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      background: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.25) 0%, rgba(13, 19, 32, 0.95) 45%, #04060c 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      font-family: 'Kanit', sans-serif;
+      color: #F8FAFC;
+    }
+
+    .gen-card {
+      width: 100%;
+      max-width: 540px;
+      background: rgba(8, 13, 22, 0.9);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 24px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 35px rgba(14, 165, 233, 0.2);
+      padding: 28px;
+    }
+
+    .gen-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .gen-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 9999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #BAE6FD;
+      margin-bottom: 10px;
+    }
+
+    .gen-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+
+    .gen-sub {
+      font-size: 13px;
+      color: #94A3B8;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #CBD5E1;
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 0 16px;
+      color: #FFFFFF;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #38BDF8;
+      background: rgba(14, 165, 233, 0.05);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+
+    select.form-input {
+      background-color: #0b111e;
+      color: #FFFFFF;
+    }
+
+    select.form-input option {
+      background-color: #0b111e !important;
+      color: #FFFFFF !important;
+      padding: 10px 14px;
+    }
+
+    .btn-generate {
+      width: 100%;
+      height: 50px;
+      background: linear-gradient(135deg, #0284C7 0%, #2563EB 100%);
+      color: #FFFFFF;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(2, 132, 199, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn-generate:hover {
+      background: linear-gradient(135deg, #0369A1 0%, #1D4ED8 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(2, 132, 199, 0.6);
+    }
+
+    .result-box {
+      margin-top: 22px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 16px;
+      padding: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #34D399;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .result-url-text {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      color: #BAE6FD;
+      word-break: break-all;
+      border: 1px solid rgba(56, 189, 248, 0.15);
+    }
+
+    .result-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-action-copy {
+      flex: 1;
+      height: 40px;
+      border-radius: 10px;
+      border: none;
+      background: #10B981;
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action-copy:hover {
+      background: #059669;
+    }
+
+    .btn-action-test {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #CBD5E1;
+      font-weight: 600;
+      font-size: 13px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-action-test:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFF;
+    }
+
+    /* History Table */
+    .history-card {
+      margin-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 18px;
+    }
+
+    .history-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #94A3B8;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .history-dest {
+      color: #CBD5E1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 280px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="gen-card">
+    <div class="gen-header">
+      <div class="gen-badge">
+        <i data-lucide="shield-check" style="width: 14px; height: 14px; color: #38bdf8;"></i>
+        <span>GATEFLOW ACCESS GATE</span>
+      </div>
+      <h1 class="gen-title">เครื่องมือสร้างลิงก์กั้นโฆษณา</h1>
+      <p class="gen-sub">สร้างลิงก์สำหรับแจกสคริปต์ (คนปลดล็อกกดคัดลอกได้ทันที) หรือลิงก์ดาวน์โหลดไฟล์</p>
+    </div>
+
+    <!-- Mode Selector: Script vs Download Link -->
+    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+      <div style="font-size: 12px; color: #a7f3d0; display: flex; align-items: center; gap: 6px;">
+        <i data-lucide="zap" style="width: 14px; height: 14px; color: #34d399;"></i>
+        <span>ลิงก์เข้าสู่เว็บหลัก (Access Gate):</span>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <a href="/dashboard" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 4px; transition: all 0.2s ease;">
+          <i data-lucide="bar-chart-2" style="width: 13px; height: 13px;"></i>
+          <span>📊 แดชบอร์ดสถิติ</span>
+        </a>
+        <button type="button" onclick="copyAccessGateUrl()" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s ease;">
+          <i data-lucide="copy" style="width: 13px; height: 13px;"></i>
+          <span id="btnCopyAccessGateTxt">/access (คัดลอก)</span>
+        </button>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 8px; margin-bottom: 20px; background: rgba(255,255,255,0.04); padding: 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+      <button type="button" id="tabModeScript" onclick="switchGenMode('script')" style="flex: 1; height: 38px; border-radius: 9px; border: none; background: #2563EB; color: #fff; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s ease;">
+        📋 แจกสคริปต์ (Script Code)
+      </button>
+      <button type="button" id="tabModeUrl" onclick="switchGenMode('url')" style="flex: 1; height: 38px; border-radius: 9px; border: none; background: transparent; color: #94A3B8; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s ease;">
+        📥 แจกลิงก์ดาวน์โหลด (MediaFire)
+      </button>
+    </div>
+
+    <form id="linkGenForm" onsubmit="generateGateLink(event)">
+      <!-- Script Code Box (Active by default) -->
+      <div class="form-group" id="grpScript">
+        <label class="form-label" for="targetScript">โค้ดสคริปต์ที่ต้องการแจก (Script Code):</label>
+        <textarea id="targetScript" class="form-input" style="height: 100px; padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; resize: vertical;" placeholder='loadstring(game:HttpGet("https://raw.githubusercontent.com/..."))()'></textarea>
+      </div>
+
+      <!-- Destination URL Box (For downloads) -->
+      <div class="form-group" id="grpUrl" style="display: none;">
+        <label class="form-label" for="targetUrl">ลิงก์ดาวน์โหลดที่ต้องการแจก (MediaFire / Drive):</label>
+        <input type="url" id="targetUrl" class="form-input" placeholder="https://www.mediafire.com/file/... หรือ Google Drive" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="customTitle">ชื่อสคริปต์ / หัวข้อหน้าด่าน:</label>
+        <input type="text" id="customTitle" class="form-input" placeholder="เช่น Blox Fruits Redz Hub หรือ แจกสคริปต์ฟีฟาย" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="customDesc">คำอธิบายใต้หัวข้อ (ไม่บังคับ):</label>
+        <input type="text" id="customDesc" class="form-input" placeholder="เช่น ทำภารกิจด้านล่างเพื่อปลดล็อกและคัดลอกสคริปต์" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="customSlug" style="display: flex; align-items: center; justify-content: space-between;">
+          <span>⚡ กำหนดชื่อลิงก์สั้น (Custom Short Slug / Alias):</span>
+          <span style="font-size: 11px; color: #38bdf8; font-weight: normal;">(เว้นว่างไว้ = สุ่มรหัสสั้น 5 ตัวให้อัตโนมัติ)</span>
+        </label>
+        <div style="position: relative; display: flex; align-items: center;">
+          <span style="position: absolute; left: 14px; color: #64748B; font-family: monospace; font-size: 13px; font-weight: 700;">/l/</span>
+          <input type="text" id="customSlug" class="form-input" style="padding-left: 38px; font-family: monospace; color: #38bdf8; font-weight: 600;" placeholder="เช่น test หรือ blox หรือ ff-aim" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="ytChannelSelect">ช่อง YouTube ที่ต้องการให้ผู้ใช้กดติดตาม:</label>
+        <select id="ytChannelSelect" class="form-input" style="appearance: auto; padding-right: 30px; background: #090e17; color: #ffffff;" onchange="toggleCustomYtInput(this.value)">
+          <option value="Blacklistxyx" style="background: #090e17; color: #ffffff;">🔴 @Blacklistxyx (ช่องหลัก - Roblox)</option>
+          <option value="GhostSensix" style="background: #090e17; color: #ffffff;">🟣 @GhostSensix (ช่อง Free Fire / แจกพาแนล)</option>
+          <option value="custom" style="background: #090e17; color: #ffffff;">✏️ กำหนดชื่อช่องเอง (@username)...</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="grpCustomYt" style="display: none;">
+        <label class="form-label" for="customYt">ลิงก์หรือชื่อช่อง YouTube กำหนดเอง:</label>
+        <input type="text" id="customYt" class="form-input" placeholder="เช่น @MyChannel หรือ https://www.youtube.com/@MyChannel" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="adRoundsSelect">จำนวนรอบโฆษณา Monetag (ความยากง่ายของด่าน):</label>
+        <select id="adRoundsSelect" class="form-input" style="appearance: auto; padding-right: 30px; background: #090e17; color: #ffffff;">
+          <option value="1">⚡ 1 รอบ (เร็วสุด - ผ่านง่าย 4 ภารกิจรวม: 3 YouTube + 1 โฆษณา)</option>
+          <option value="2">⚖️ 2 รอบ (สมดุล - 5 ภารกิจรวม: 3 YouTube + 2 โฆษณา)</option>
+          <option value="3" selected>🔥 3 รอบ (มาตรฐานเดิม - 6 ภารกิจรวม: 3 YouTube + 3 โฆษณา)</option>
+          <option value="4">💰 4 รอบ (ฟาร์มรายได้จัดเต็ม - 7 ภารกิจรวม: 3 YouTube + 4 โฆษณา)</option>
+          <option value="0">🎁 0 รอบ (ฟรี 100% ไม่มีโฆษณา - 3 ภารกิจ YouTube เท่านั้น)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="domainOption">โดเมนที่ต้องการใช้กั้น:</label>
+        <select id="domainOption" class="form-input" style="appearance: auto; padding-right: 30px; background: #090e17; color: #ffffff;">
+          <option value="cloudflare" style="background: #090e17; color: #ffffff;">https://th.blacklisthub.workers.dev (Cloudflare ใช้งานจริง)</option>
+          <option value="local" style="background: #090e17; color: #ffffff;">http://localhost:3000 (ทดสอบบนเครื่อง)</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-generate">
+        <i data-lucide="sparkles" style="width: 18px; height: 18px;"></i>
+        <span>สร้างลิงก์ GateFlow ทันที ⚡</span>
+      </button>
+    </form>
+
+    <!-- Result Box -->
+    <div class="result-box" id="resultBox">
+      <div class="result-label">
+        <i data-lucide="check-circle-2" style="width: 15px; height: 15px;"></i>
+        <span>สร้างลิงก์กั้นโฆษณาสำเร็จแล้ว! (พร้อมนำไปแปะใต้คลิป)</span>
+      </div>
+
+      <div class="result-url-text" id="resultUrlText"></div>
+
+      <div class="result-actions">
+        <button type="button" class="btn-action-copy" id="btnCopyResult" onclick="copyResultLink()">
+          <i data-lucide="copy" style="width: 15px; height: 15px;"></i>
+          <span>คัดลอกลิงก์</span>
+        </button>
+        <a href="#" target="_blank" class="btn-action-test" id="btnTestResult">
+          <i data-lucide="external-link" style="width: 15px; height: 15px;"></i>
+          <span>ทดสอบเปิด</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- History List -->
+    <div class="history-card" id="historyCard" style="display: none;">
+      <div class="history-title">
+        <span>ประวัติลิงก์ที่เคยสร้างล่าสุด</span>
+        <button type="button" onclick="clearHistory()" style="background: none; border: none; color: #EF4444; font-size: 11px; cursor: pointer;">ล้างประวัติ</button>
+      </div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentGeneratedUrl = '';
+    let currentMode = 'script'; // 'script' or 'url'
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadHistory();
+      lucide.createIcons();
+    });
+
+    function switchGenMode(mode) {
+      currentMode = mode;
+      const tabScript = document.getElementById('tabModeScript');
+      const tabUrl = document.getElementById('tabModeUrl');
+      const grpScript = document.getElementById('grpScript');
+      const grpUrl = document.getElementById('grpUrl');
+
+      if (mode === 'script') {
+        tabScript.style.background = '#2563EB';
+        tabScript.style.color = '#fff';
+        tabUrl.style.background = 'transparent';
+        tabUrl.style.color = '#94A3B8';
+        grpScript.style.display = 'block';
+        grpUrl.style.display = 'none';
+      } else {
+        tabUrl.style.background = '#2563EB';
+        tabUrl.style.color = '#fff';
+        tabScript.style.background = 'transparent';
+        tabScript.style.color = '#94A3B8';
+        grpScript.style.display = 'none';
+        grpUrl.style.display = 'block';
+      }
+    }
+
+    function toggleCustomYtInput(val) {
+      const grp = document.getElementById('grpCustomYt');
+      if (grp) grp.style.display = val === 'custom' ? 'block' : 'none';
+    }
+
+    async function generateGateLink(e) {
+      e.preventDefault();
+      const domainChoice = document.getElementById('domainOption').value;
+
+      let baseUrl = 'https://th.blacklisthub.workers.dev';
+      if (domainChoice === 'local' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        if (domainChoice === 'local') {
+          baseUrl = `http://${window.location.host}`;
+        }
+      }
+
+      const customTitle = (document.getElementById('customTitle')?.value || '').trim();
+      const customDesc = (document.getElementById('customDesc')?.value || '').trim();
+      const customSlug = (document.getElementById('customSlug')?.value || '').trim();
+
+      const channelChoice = document.getElementById('ytChannelSelect')?.value || 'Blacklistxyx';
+      let selectedChannel = channelChoice;
+      if (channelChoice === 'custom') {
+        const customCh = (document.getElementById('customYt')?.value || '').trim();
+        if (customCh) selectedChannel = customCh;
+      }
+      const adRounds = parseInt(document.getElementById('adRoundsSelect')?.value || '3', 10);
+
+      let scriptCode = '';
+      let targetUrl = '';
+
+      if (currentMode === 'script') {
+        scriptCode = (document.getElementById('targetScript')?.value || '').trim();
+        if (!scriptCode) {
+          alert('กรุณาวางโค้ดสคริปต์ที่ต้องการแจก');
+          return;
+        }
+      } else {
+        targetUrl = (document.getElementById('targetUrl')?.value || '').trim();
+        if (!targetUrl) {
+          alert('กรุณาวางลิงก์ดาวน์โหลดปลายทาง');
+          return;
+        }
+      }
+
+      // Show loading indicator
+      const btnGen = document.querySelector('.btn-generate');
+      const originalBtnHtml = btnGen ? btnGen.innerHTML : '';
+      if (btnGen) {
+        btnGen.innerHTML = '<i data-lucide="sparkles" style="width: 18px; height: 18px;"></i><span>กำลังสร้างลิงก์สั้น...</span>';
+      }
+
+      currentGeneratedUrl = '';
+
+      try {
+        const payload = {
+          slug: customSlug,
+          url: targetUrl,
+          script: scriptCode,
+          title: customTitle,
+          desc: customDesc,
+          ch: selectedChannel,
+          ads: adRounds
+        };
+
+        const res = await fetch('/api/locker/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.success && data.slug) {
+            currentGeneratedUrl = `${baseUrl}/l/${data.slug}`;
+          }
+        }
+      } catch (err) {
+        console.warn('API short link create failed, falling back:', err);
+      }
+
+      // Fallback if API was unavailable
+      if (!currentGeneratedUrl || !currentGeneratedUrl.includes('/l/')) {
+        let queryParams = [];
+        if (selectedChannel && selectedChannel !== 'Blacklistxyx') queryParams.push(`ch=${encodeURIComponent(selectedChannel)}`);
+        if (scriptCode) queryParams.push(`script=${encodeURIComponent(scriptCode)}`);
+        if (targetUrl) queryParams.push(`url=${encodeURIComponent(targetUrl)}`);
+        if (customTitle) queryParams.push(`title=${encodeURIComponent(customTitle)}`);
+        if (customDesc) queryParams.push(`desc=${encodeURIComponent(customDesc)}`);
+        currentGeneratedUrl = `${baseUrl}/go?${queryParams.join('&')}`;
+      }
+
+      if (btnGen) btnGen.innerHTML = originalBtnHtml;
+
+      // Save to History
+      saveToHistory(customTitle || (targetUrl || 'Blox Fruits Script'), currentGeneratedUrl);
+
+      // Show result
+      const resultBox = document.getElementById('resultBox');
+      const resultText = document.getElementById('resultUrlText');
+      const testBtn = document.getElementById('btnTestResult');
+
+      resultText.textContent = currentGeneratedUrl;
+      testBtn.href = currentGeneratedUrl;
+      resultBox.style.display = 'flex';
+
+      // Auto copy
+      copyResultLink();
+      lucide.createIcons();
+    }
+
+    function copyResultLink() {
+      if (!currentGeneratedUrl) return;
+      navigator.clipboard.writeText(currentGeneratedUrl).then(() => {
+        const btn = document.getElementById('btnCopyResult');
+        btn.innerHTML = '<i data-lucide="check" style="width: 15px; height: 15px;"></i><span>คัดลอกแล้ว! ✅</span>';
+        lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = '<i data-lucide="copy" style="width: 15px; height: 15px;"></i><span>คัดลอกลิงก์</span>';
+          lucide.createIcons();
+        }, 2000);
+      });
+    }
+
+    function copyAccessGateUrl() {
+      const channelChoice = document.getElementById('ytChannelSelect')?.value || 'Blacklistxyx';
+      const baseUrl = window.location.origin || 'https://th.blacklisthub.workers.dev';
+      let url = `${baseUrl}/access`;
+      if (channelChoice === 'GhostSensix') {
+        url += '?ch=GhostSensix';
+      } else if (channelChoice === 'custom') {
+        const customCh = (document.getElementById('customYt')?.value || '').trim();
+        if (customCh) url += `?ch=${encodeURIComponent(customCh)}`;
+      }
+      navigator.clipboard.writeText(url).then(() => {
+        const t = document.getElementById('btnCopyAccessGateTxt');
+        if (t) t.textContent = 'คัดลอกแล้ว! ✅';
+        setTimeout(() => { if (t) t.textContent = '/access (คัดลอก)'; }, 2500);
+      });
+    }
+
+    function saveToHistory(target, lockedUrl) {
+      try {
+        let history = JSON.parse(localStorage.getItem('blackpass_gen_history') || '[]');
+        history.unshift({ target, lockedUrl, time: new Date().toLocaleTimeString('th-TH') });
+        if (history.length > 5) history = history.slice(0, 5);
+        localStorage.setItem('blackpass_gen_history', JSON.stringify(history));
+        loadHistory();
+      } catch (err) {}
+    }
+
+    function loadHistory() {
+      try {
+        const history = JSON.parse(localStorage.getItem('blackpass_gen_history') || '[]');
+        const card = document.getElementById('historyCard');
+        const list = document.getElementById('historyList');
+
+        if (!history || history.length === 0) {
+          card.style.display = 'none';
+          return;
+        }
+
+        card.style.display = 'block';
+        list.innerHTML = '';
+
+        history.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'history-item';
+          div.innerHTML = `
+            <span class="history-dest" title="${item.target}">${item.target}</span>
+            <button type="button" onclick="navigator.clipboard.writeText('${item.lockedUrl}'); alert('คัดลอกลิงก์แล้ว!');" style="background: rgba(56,189,248,0.2); border: 1px solid rgba(56,189,248,0.4); color: #38bdf8; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 11px; white-space: nowrap;">ก๊อปปี้</button>
+          `;
+          list.appendChild(div);
+        });
+      } catch (err) {}
+    }
+
+    function clearHistory() {
+      localStorage.removeItem('blackpass_gen_history');
+      loadHistory();
+    }
+  </script>
+</body>
+</html>
+
