@@ -1156,7 +1156,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const shrinkUrl = (siteConfig.lootlabsGate && siteConfig.lootlabsGate.shrinkmeUrl)
             ? siteConfig.lootlabsGate.shrinkmeUrl
-            : "https://shrinkme.click/aZd1s";
+            : "https://shrinkme.click/q5uoZE0";
 
         if (btnGateUnlock) {
             btnGateUnlock.href = shrinkUrl;
