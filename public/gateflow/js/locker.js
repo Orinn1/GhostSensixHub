@@ -395,7 +395,7 @@ async function fetchLatestVideo() {
     }
   } catch (e) {}
 
-  cachedLatestVideoUrl = 'https://www.youtube.com/watch?v=HVPqCzVCnQk';
+  cachedLatestVideoUrl = 'https://www.youtube.com/watch?v=GTSVT1ax-jc';
 }
 
 // Helper: Get Target YouTube Video URL (Auto resolved from YouTube channel)
@@ -408,7 +408,7 @@ function getTargetVideoUrl() {
     return cachedLatestVideoUrl;
   }
 
-  return 'https://www.youtube.com/watch?v=HVPqCzVCnQk';
+  return 'https://www.youtube.com/watch?v=GTSVT1ax-jc';
 }
 
 // 3. Handle Social Task Clicks (1-4)
