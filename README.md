@@ -63,3 +63,4 @@ ghostsensi/
 
 - **Admin Portal PIN**: `admin888`
 - **VIP Bypass Passcode**: `admin888` / `ghost888` / `1234`
+
