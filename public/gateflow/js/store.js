@@ -13,9 +13,9 @@ const DEFAULT_LOCKERS = [
   {
     id: 'bp_hub_access',
     userId: 'orin_rankone',
-    name: 'Blacklist Script Hub Access',
+    name: 'GhostSensix Script Hub Access',
     slug: 'hub-access',
-    destinationUrl: 'https://th.blacklisthub.workers.dev/?auth_success=1',
+    destinationUrl: '/',
     type: 'multistep',
     steps: 3,
     timer: 8,
