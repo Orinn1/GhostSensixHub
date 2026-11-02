@@ -1,4 +1,0 @@
-# Cloudflare Pages Redirects / Rewrites
-/admin    /admin.html    200
-/admin/   /admin.html    200
-
