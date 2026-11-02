@@ -1,4 +1,4 @@
-﻿param (
+param (
     [int]$Port = 3001,
     [string]$Root = "$PSScriptRoot\public"
 )
@@ -48,6 +48,41 @@ try {
                 continue
             }
 
+            # YouTube Latest Video Real-Time Feed
+            if ($rawPath -eq "/api/latest-video") {
+                try {
+                    $rssUrl = "https://www.youtube.com/feeds/videos.xml?channel_id=UC8laKzbaWUNJMJ6XN_pxiBg"
+                    $client = New-Object System.Net.WebClient
+                    $client.Headers.Add("User-Agent", "Mozilla/5.0")
+                    $client.Encoding = [System.Text.Encoding]::UTF8
+                    $xml = $client.DownloadString($rssUrl)
+                    if ($xml -match '<yt:videoId>(.*?)</yt:videoId>') {
+                        $vId = $matches[1].Trim()
+                        $payload = @{
+                            success = $true
+                            videoId = $vId
+                            videoUrl = "https://www.youtube.com/watch?v=$vId"
+                            channel = "GhostSensix"
+                        } | ConvertTo-Json
+                        $bytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
+                        $response.ContentType = "application/json; charset=utf-8"
+                        $response.ContentLength64 = $bytes.Length
+                        $response.StatusCode = 200
+                        $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                    } else {
+                        throw "No video match"
+                    }
+                } catch {
+                    $fallback = '{"success":true,"videoId":"GTSVT1ax-jc","videoUrl":"https://www.youtube.com/watch?v=GTSVT1ax-jc"}'
+                    $bytes = [System.Text.Encoding]::UTF8.GetBytes($fallback)
+                    $response.ContentType = "application/json"
+                    $response.StatusCode = 200
+                    $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                }
+                $response.Close()
+                continue
+            }
+
             # Local backup API for scripts.json
             if ($rawPath -eq "/api/save-scripts" -and $request.HttpMethod -eq "POST") {
                 try {
@@ -69,6 +104,41 @@ try {
                 continue
             }
 
+            # YouTube Latest Video Real-Time Feed
+            if ($rawPath -eq "/api/latest-video") {
+                try {
+                    $rssUrl = "https://www.youtube.com/feeds/videos.xml?channel_id=UC8laKzbaWUNJMJ6XN_pxiBg"
+                    $client = New-Object System.Net.WebClient
+                    $client.Headers.Add("User-Agent", "Mozilla/5.0")
+                    $client.Encoding = [System.Text.Encoding]::UTF8
+                    $xml = $client.DownloadString($rssUrl)
+                    if ($xml -match '<yt:videoId>(.*?)</yt:videoId>') {
+                        $vId = $matches[1].Trim()
+                        $payload = @{
+                            success = $true
+                            videoId = $vId
+                            videoUrl = "https://www.youtube.com/watch?v=$vId"
+                            channel = "GhostSensix"
+                        } | ConvertTo-Json
+                        $bytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
+                        $response.ContentType = "application/json; charset=utf-8"
+                        $response.ContentLength64 = $bytes.Length
+                        $response.StatusCode = 200
+                        $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                    } else {
+                        throw "No video match"
+                    }
+                } catch {
+                    $fallback = '{"success":true,"videoId":"GTSVT1ax-jc","videoUrl":"https://www.youtube.com/watch?v=GTSVT1ax-jc"}'
+                    $bytes = [System.Text.Encoding]::UTF8.GetBytes($fallback)
+                    $response.ContentType = "application/json"
+                    $response.StatusCode = 200
+                    $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                }
+                $response.Close()
+                continue
+            }
+
             # WEAO API Reverse Proxy
             if ($rawPath -eq "/api/exploits") {
                 try {
@@ -85,6 +155,41 @@ try {
                     $response.ContentType = "application/json"
                     $response.StatusCode = 502
                     $response.OutputStream.Write($err, 0, $err.Length)
+                }
+                $response.Close()
+                continue
+            }
+
+            # YouTube Latest Video Real-Time Feed
+            if ($rawPath -eq "/api/latest-video") {
+                try {
+                    $rssUrl = "https://www.youtube.com/feeds/videos.xml?channel_id=UC8laKzbaWUNJMJ6XN_pxiBg"
+                    $client = New-Object System.Net.WebClient
+                    $client.Headers.Add("User-Agent", "Mozilla/5.0")
+                    $client.Encoding = [System.Text.Encoding]::UTF8
+                    $xml = $client.DownloadString($rssUrl)
+                    if ($xml -match '<yt:videoId>(.*?)</yt:videoId>') {
+                        $vId = $matches[1].Trim()
+                        $payload = @{
+                            success = $true
+                            videoId = $vId
+                            videoUrl = "https://www.youtube.com/watch?v=$vId"
+                            channel = "GhostSensix"
+                        } | ConvertTo-Json
+                        $bytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
+                        $response.ContentType = "application/json; charset=utf-8"
+                        $response.ContentLength64 = $bytes.Length
+                        $response.StatusCode = 200
+                        $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                    } else {
+                        throw "No video match"
+                    }
+                } catch {
+                    $fallback = '{"success":true,"videoId":"GTSVT1ax-jc","videoUrl":"https://www.youtube.com/watch?v=GTSVT1ax-jc"}'
+                    $bytes = [System.Text.Encoding]::UTF8.GetBytes($fallback)
+                    $response.ContentType = "application/json"
+                    $response.StatusCode = 200
+                    $response.OutputStream.Write($bytes, 0, $bytes.Length)
                 }
                 $response.Close()
                 continue
@@ -140,6 +245,41 @@ try {
                     $response.ContentType = "application/json"
                     $response.StatusCode = 502
                     $response.OutputStream.Write($err, 0, $err.Length)
+                }
+                $response.Close()
+                continue
+            }
+
+            # YouTube Latest Video Real-Time Feed
+            if ($rawPath -eq "/api/latest-video") {
+                try {
+                    $rssUrl = "https://www.youtube.com/feeds/videos.xml?channel_id=UC8laKzbaWUNJMJ6XN_pxiBg"
+                    $client = New-Object System.Net.WebClient
+                    $client.Headers.Add("User-Agent", "Mozilla/5.0")
+                    $client.Encoding = [System.Text.Encoding]::UTF8
+                    $xml = $client.DownloadString($rssUrl)
+                    if ($xml -match '<yt:videoId>(.*?)</yt:videoId>') {
+                        $vId = $matches[1].Trim()
+                        $payload = @{
+                            success = $true
+                            videoId = $vId
+                            videoUrl = "https://www.youtube.com/watch?v=$vId"
+                            channel = "GhostSensix"
+                        } | ConvertTo-Json
+                        $bytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
+                        $response.ContentType = "application/json; charset=utf-8"
+                        $response.ContentLength64 = $bytes.Length
+                        $response.StatusCode = 200
+                        $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                    } else {
+                        throw "No video match"
+                    }
+                } catch {
+                    $fallback = '{"success":true,"videoId":"GTSVT1ax-jc","videoUrl":"https://www.youtube.com/watch?v=GTSVT1ax-jc"}'
+                    $bytes = [System.Text.Encoding]::UTF8.GetBytes($fallback)
+                    $response.ContentType = "application/json"
+                    $response.StatusCode = 200
+                    $response.OutputStream.Write($bytes, 0, $bytes.Length)
                 }
                 $response.Close()
                 continue
