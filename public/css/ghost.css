@@ -70,16 +70,30 @@ body {
 }
 
 .btn-primary, .btn-unlock, .btn-glow {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 10px 22px !important;
+    border-radius: 8px !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    cursor: pointer !important;
     background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%) !important;
     color: #ffffff !important;
     box-shadow: 0 4px 18px rgba(168, 85, 247, 0.45) !important;
     border: none !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+    line-height: 1.4 !important;
 }
 
 .btn-primary:hover, .btn-unlock:hover {
     background: linear-gradient(135deg, #a855f7 0%, #c084fc 100%) !important;
     box-shadow: 0 6px 24px rgba(192, 132, 252, 0.7) !important;
-    transform: translateY(-1.5px);
+    transform: translateY(-1.5px) !important;
 }
 
 .script-row:hover, .script-card:hover {
@@ -104,5 +118,318 @@ body {
     background: linear-gradient(90deg, rgba(168, 85, 247, 0.22) 0%, transparent 100%) !important;
     color: #ffffff !important;
     border-left: 3px solid var(--primary) !important;
+}
+
+/* Game Category Dropdown Popup */
+.core-game-dropdown-menu.open,
+.core-game-dropdown-menu.show {
+    display: flex !important;
+    background: #110c22 !important;
+    border: 1px solid #3d2970 !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(168, 85, 247, 0.25) !important;
+    z-index: 99999 !important;
+}
+
+/* sUNC Modal Dark Violet Theme */
+.sunc-modal-box {
+    background: #110c22 !important;
+    border: 1px solid #3d2970 !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(168, 85, 247, 0.2) !important;
+}
+
+/* Locker Modal Theme */
+.locker-box {
+    background: #110c22 !important;
+    border: 1px solid #3d2970 !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(168, 85, 247, 0.2) !important;
+}
+
+/* ==========================================================================
+   HERO SPOTLIGHT & RESPONSIVE LAYOUT ENHANCEMENTS
+   ========================================================================== */
+.hero-spotlight {
+    margin-bottom: 24px !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+.spotlight-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 24px;
+    align-items: center;
+    padding: 28px 32px;
+}
+
+.spotlight-content h2 {
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+    margin: 12px 0 8px 0;
+    line-height: 1.3;
+}
+
+.spotlight-content p {
+    font-size: 14px;
+    color: #a99fc4;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.spotlight-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-secondary-action {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+    line-height: 1.4 !important;
+}
+
+.btn-secondary-action:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(168, 85, 247, 0.4);
+    transform: translateY(-1.5px);
+}
+
+.spotlight-banner-wrap {
+    text-align: right;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    background: #090514;
+}
+
+.spotlight-banner-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    object-fit: cover;
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVE BREAKPOINT (<= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* Main container padding */
+    .app-main {
+        padding: 0 12px 85px 12px !important;
+    }
+
+    /* Mobile Search Bar */
+    .mobile-search-box {
+        margin: 10px 0 16px 0 !important;
+    }
+
+    /* Hero Spotlight on Mobile: Stack cleanly with Banner on Top */
+    .spotlight-grid {
+        display: flex !important;
+        flex-direction: column-reverse !important;
+        gap: 16px !important;
+        padding: 18px 16px !important;
+    }
+
+    .spotlight-banner-wrap {
+        width: 100% !important;
+        max-height: 180px !important;
+        text-align: center !important;
+        border-radius: 12px !important;
+    }
+
+    .spotlight-banner-img {
+        width: 100% !important;
+        max-height: 180px !important;
+        object-fit: cover !important;
+    }
+
+    .spotlight-content h2 {
+        font-size: 21px !important;
+        margin: 8px 0 6px 0 !important;
+    }
+
+    .spotlight-content p {
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+        margin-bottom: 16px !important;
+    }
+
+    .spotlight-actions {
+        display: flex !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    .spotlight-actions .btn-primary,
+    .spotlight-actions .btn-secondary-action {
+        flex: 1 1 0 !important;
+        justify-content: center !important;
+        padding: 11px 12px !important;
+        font-size: 13px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Section Headings */
+    .section-head {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .section-head-title {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        flex: 1 !important;
+        min-width: 0 !important;
+    }
+
+    .section-head-title h3 {
+        font-size: 14.5px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        margin: 0 !important;
+    }
+
+    .section-pill-badge {
+        font-size: 10px !important;
+        padding: 2px 6px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .btn-view-all {
+        font-size: 11.5px !important;
+        padding: 6px 10px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        border-radius: 6px !important;
+    }
+
+    /* Marquee Cards on Mobile */
+    .executor-marquee-card {
+        min-width: 180px !important;
+        padding: 8px 12px !important;
+        gap: 10px !important;
+    }
+
+    .executor-marquee-card .marquee-name {
+        font-size: 13px !important;
+    }
+
+    .executor-marquee-card .marquee-sunc-pill {
+        font-size: 10.5px !important;
+    }
+
+    /* Top navbar on mobile */
+    .core-simple-navbar {
+        padding: 0 12px !important;
+    }
+
+    .core-brand-title {
+        font-size: 15px !important;
+    }
+
+    .core-action-btn {
+        padding: 6px 10px !important;
+    }
+}
+
+/* ==========================================================================
+   SPONSOR GATE GHOST THEME (ASTRAL VIOLET)
+   ========================================================================== */
+.lootlabs-gate-overlay {
+    background: radial-gradient(circle at 50% 18%, rgba(168, 85, 247, 0.22) 0%, rgba(168, 85, 247, 0.08) 35%, #080511 75%) !important;
+}
+
+.gate-stage {
+    background: rgba(18, 12, 36, 0.88) !important;
+    border: 1px solid rgba(168, 85, 247, 0.35) !important;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 45px rgba(168, 85, 247, 0.25) !important;
+}
+
+.gate-emblem {
+    border-color: #a855f7 !important;
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.6) !important;
+}
+
+.gate-title-glow {
+    background: linear-gradient(135deg, #ffffff 0%, #d8b4fe 40%, #a855f7 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.gate-btn-primary {
+    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%) !important;
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.55), 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+}
+
+.gate-btn-primary:hover {
+    box-shadow: 0 0 35px rgba(192, 132, 252, 0.8) !important;
+    transform: translateY(-2px) !important;
+}
+
+.gate-btn-secondary {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(168, 85, 247, 0.35) !important;
+    color: #f5f2fc !important;
+}
+
+.gate-btn-secondary:hover {
+    background: rgba(168, 85, 247, 0.18) !important;
+    border-color: #a855f7 !important;
+}
+
+.gate-status-pill {
+    background: rgba(168, 85, 247, 0.15) !important;
+    border: 1px solid rgba(168, 85, 247, 0.4) !important;
+    color: #d8b4fe !important;
+}
+
+.gate-status-dot {
+    background: #a855f7 !important;
+    box-shadow: 0 0 10px #c084fc !important;
+}
+
+.gate-chip {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(168, 85, 247, 0.22) !important;
+    color: #e2e8f0 !important;
+}
+
+.gate-fade-out {
+    animation: gateFadeOut 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes gateFadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.97);
+        pointer-events: none;
+    }
 }
 

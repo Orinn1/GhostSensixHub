@@ -43,17 +43,51 @@
         content="Free & 100% safe Roblox scripts, updated daily with executor status and sUNC score benchmarks.">
     <meta name="twitter:image" content="Banner.png">
 
-    <!-- Standalone Setup: Gate disabled on localhost so homepage is directly accessible -->
+    <!-- Security Sponsor Gate Controller (24-Hour Pass) -->
     <script>
         (function () {
-            // Standalone GhostSensix mode - direct homepage access
-            console.log("[GhostSensix] Standalone ScriptHub ready.");
+            try {
+                const params = new URLSearchParams(window.location.search);
+                // 1. Reset / lock test helper: ?lock=1 or ?reset=1
+                if (params.has("lock") || params.has("reset") || params.has("relock") || params.has("test")) {
+                    localStorage.removeItem("ghostsensix_gate_pass");
+                    sessionStorage.removeItem("ghostsensix_gate_pass");
+                    localStorage.removeItem("ghostsensix_gate_clicked");
+                    localStorage.removeItem("ghostsensix_gate_click_time");
+                    document.documentElement.classList.add("gate-active-init");
+                    return;
+                }
+
+                // 2. Incoming Pass Token check (when redirected back from ShrinkMe)
+                const passToken = params.get("pass_token") || params.get("token") || params.get("key") || params.get("auth") || params.get("verified");
+                const ref = (document.referrer || "").toLowerCase();
+                const isFromShortener = ref.includes("shrinkme") || ref.includes("shrinkearn") || ref.includes("srnky") || ref.includes("shrinkforearn");
+
+                if (passToken || isFromShortener) {
+                    const expiry = Date.now() + 24 * 60 * 60 * 1000;
+                    localStorage.setItem("ghostsensix_gate_pass", String(expiry));
+                    sessionStorage.setItem("ghostsensix_gate_pass", String(expiry));
+                    document.documentElement.classList.remove("gate-active-init");
+                    try {
+                        const cleanUrl = window.location.origin + window.location.pathname;
+                        window.history.replaceState({}, document.title, cleanUrl);
+                    } catch (e) {}
+                    return;
+                }
+
+                // 3. Normal check: is device already remembered for 24 hours?
+                const passExpiry = localStorage.getItem("ghostsensix_gate_pass") || sessionStorage.getItem("ghostsensix_gate_pass");
+                const now = Date.now();
+                if (!passExpiry || now > parseInt(passExpiry, 10)) {
+                    document.documentElement.classList.add("gate-active-init");
+                }
+            } catch (e) {}
         })();
     </script>
 
-    <link rel="stylesheet" href="css/style.css?v=20261102_ghost_v1">
-    <link rel="stylesheet" href="css/sunc.css?v=20261102_ghost_v1">
-    <link rel="stylesheet" href="css/ghost.css?v=20261102_ghost_v1">
+    <link rel="stylesheet" href="css/style.css?v=20261102_ghost_v5">
+    <link rel="stylesheet" href="css/sunc.css?v=20261102_ghost_v5">
+    <link rel="stylesheet" href="css/ghost.css?v=20261102_ghost_v5">
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="Logo.png">
     <link rel="shortcut icon" type="image/png" href="Logo.png">
@@ -61,6 +95,71 @@
 </head>
 
 <body>
+
+    <!-- =======================================================================
+         SECURITY SPONSOR ACCESS GATE (24-Hour Pass)
+         ======================================================================= -->
+    <div class="lootlabs-gate-overlay" id="lootlabsGateOverlay">
+        <div class="gate-stage">
+            <!-- Emblem Logo -->
+            <div class="gate-emblem-wrap">
+                <div class="gate-emblem">
+                    <img src="Logo.png" alt="GhostSensix" class="gate-emblem-img">
+                </div>
+            </div>
+
+            <!-- Status Pill -->
+            <div class="gate-status-pill">
+                <span class="gate-status-dot"></span>
+                <span class="gate-status-text">SPONSOR PASS REQUIRED</span>
+            </div>
+
+            <!-- Title & Subtitle -->
+            <h2 class="gate-title">
+                <span class="gate-title-prefix">Welcome to</span>
+                <span class="gate-title-glow">GhostSensix</span>
+            </h2>
+            <p class="gate-subtitle">
+                Complete a quick free sponsor check to unlock a 24-hour unlimited pass to all Roblox scripts, loaders, and executor status benchmarks.
+            </p>
+
+            <!-- Feature Chips -->
+            <div class="gate-chips-row">
+                <span class="gate-chip">
+                    <i data-lucide="shield-check" class="chip-icon-cyan"></i> 100% Safe & Tested
+                </span>
+                <span class="gate-chip">
+                    <i data-lucide="clock" class="chip-icon-green"></i> 24-Hour Pass
+                </span>
+                <span class="gate-chip">
+                    <i data-lucide="zap" class="chip-icon-blue"></i> Instant Loader Copy
+                </span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="gate-actions-row">
+                <a href="https://shrinkme.click/aZd1s" target="_blank" class="gate-btn-primary" id="btnGateUnlock">
+                    <i data-lucide="external-link" style="width: 16px; height: 16px;"></i> Unlock Access (Free)
+                </a>
+            </div>
+
+            <!-- VIP / Admin Passcode Bypass -->
+            <div style="margin-top: 14px; width: 100%; max-width: 340px;">
+                <div style="display: flex; gap: 8px;">
+                    <input type="password" id="gatePasscodeInput" placeholder="VIP Passcode (e.g. admin888)" style="flex: 1; padding: 10px 14px; background: rgba(8,5,17,0.8); border: 1px solid rgba(168,85,247,0.3); border-radius: 8px; color: #fff; font-size: 13px; text-align: center; outline: none;">
+                    <button type="button" id="btnGatePasscode" style="padding: 10px 16px; background: rgba(168,85,247,0.25); border: 1px solid #a855f7; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;">
+                        Bypass
+                    </button>
+                </div>
+                <div id="gateErrorMsg" style="display: none; color: #f87171; font-size: 12px; margin-top: 6px; text-align: center;"></div>
+            </div>
+
+            <!-- Footer note -->
+            <div class="gate-footer">
+                <span>Free access is refreshed daily &bull; GhostSensix Official Script Hub</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Backdrop for mobile drawer -->
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
@@ -147,7 +246,6 @@
                         </div>
                         <div class="core-nav-tab menu-item" data-nav="exploits">
                             <span class="menu-left"><i data-lucide="cpu"></i> <span id="lblNavExploits">Executor Status & sUNC</span></span>
-                            <span class="core-tab-badge green menu-badge">WEAO LIVE</span>
                         </div>
                     </div>
 
@@ -202,39 +300,39 @@
                     </div>
 
                     <!-- Spotlight Hero Banner Section -->
-                    <section class="spotlight-card" style="margin-bottom: 28px; border-radius: 16px; overflow: hidden; position: relative;">
-                        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; align-items: center; padding: 28px 32px;">
-                            <div>
-                                <span class="tag-badge" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px;">
+                    <section class="spotlight-card hero-spotlight">
+                        <div class="spotlight-grid">
+                            <div class="spotlight-content">
+                                <span class="tag-badge">
                                     <i data-lucide="sparkles" style="width: 13px; height: 13px;"></i> OFFICIAL SCRIPT HUB
                                 </span>
-                                <h2 style="font-size: 26px; font-weight: 800; color: #fff; margin: 12px 0 8px 0; line-height: 1.3;" id="spotlightTitle">
+                                <h2 id="spotlightTitle">
                                     GhostSensix Hub
                                 </h2>
-                                <p style="font-size: 14px; color: #a99fc4; line-height: 1.6; margin-bottom: 20px;" id="spotlightDesc">
+                                <p id="spotlightDesc">
                                     Official Roblox exploit hub & script loader. All scripts verified 100% safe & undetected.
                                 </p>
-                                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                                    <button type="button" class="btn-primary" style="padding: 10px 22px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;" onclick="document.querySelector('[data-nav=\'feed\']').click();">
+                                <div class="spotlight-actions">
+                                    <button type="button" class="btn-primary" onclick="document.querySelector('[data-nav=\'feed\']').click();">
                                         <i data-lucide="code" style="width: 16px; height: 16px;"></i> All Scripts
                                     </button>
-                                    <a href="https://www.youtube.com/@GhostSensix" target="_blank" style="padding: 10px 18px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #fff; text-decoration: none; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                                        <i data-lucide="youtube" style="width: 16px; height: 16px; color: #ef4444;"></i> YouTube
+                                    <a href="https://www.youtube.com/@GhostSensix" target="_blank" class="btn-secondary-action">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="#ef4444" aria-hidden="true" style="vertical-align: middle;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="#ffffff" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> YouTube
                                     </a>
                                 </div>
                             </div>
-                            <div style="text-align: right; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.5);">
-                                <img src="Banner.png" alt="GhostSensix Banner" style="width: 100%; height: auto; display: block; border-radius: 12px; border: 1px solid rgba(168, 85, 247, 0.25);">
+                            <div class="spotlight-banner-wrap">
+                                <img src="Banner.png" alt="GhostSensix Banner" class="spotlight-banner-img">
                             </div>
                         </div>
                     </section>
 
-                    <!-- Executors Live from WEAO API (Marquee) -->
+                    <!-- Executors Live Marquee -->
                     <section class="home-executors-section">
                         <div class="section-head">
                             <div class="section-head-title">
                                 <span class="section-icon-glow green"><i data-lucide="cpu"></i></span>
-                                <h3><span id="lblExecutorsHead">Live Executor Status & sUNC (WEAO)</span></h3>
+                                <h3><span id="lblExecutorsHead">Live Executor Status & sUNC</span></h3>
                                 <span class="section-pill-badge green"><span class="pulse-dot green"></span> SYNCED</span>
                             </div>
                             <button class="btn-view-all" id="btnSeeAllExploits">
@@ -245,7 +343,7 @@
                         <div class="executors-marquee-container" id="homeExecutorsContainer">
                             <div class="executors-marquee-track" id="homeExecutorsGrid">
                                 <div style="padding: 24px; color: var(--text-muted); text-align: center; width: 100%;" id="lblLoadingExploits">
-                                    <i data-lucide="loader-2" class="spin"></i> Loading executor status from WEAO API...
+                                    <i data-lucide="loader-2" class="spin"></i> Loading live executor status...
                                 </div>
                             </div>
                             <div class="marquee-fade-edge marquee-fade-left"></div>
@@ -319,7 +417,7 @@
 
                     <div class="exploits-grid" id="exploitsGrid">
                         <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);" id="lblLoadingAllExploits">
-                            <i data-lucide="loader-2" class="spin"></i> Loading data from WEAO API...
+                            <i data-lucide="loader-2" class="spin"></i> Loading live executor status...
                         </div>
                     </div>
                 </div>
@@ -354,76 +452,28 @@
     </div>
 
     <!-- =======================================================================
-         MODAL SUB2UNLOCK
+         MODAL SCRIPT CODE (Direct Copy)
          ======================================================================= -->
     <div class="modal-overlay" id="lockerModal">
-        <div class="locker-box">
+        <div class="locker-box" style="max-width: 520px; padding: 26px 22px;">
             <button class="modal-close" id="closeLockerBtn" aria-label="Close"><i data-lucide="x"></i></button>
 
-            <div class="locker-header">
-                <span class="badge-lock"><i data-lucide="lock"></i> <span id="lblLockerTitle">UNLOCK SCRIPT CODE</span></span>
-                <h3 id="modalScriptTitle">Script Title</h3>
-                <p id="lblLockerDesc">Complete the steps below to reveal and copy your Lua loader</p>
+            <div class="locker-header" style="text-align: left; margin-bottom: 16px;">
+                <div style="margin-bottom: 8px;">
+                    <span class="tag-badge" style="background: rgba(168, 85, 247, 0.18); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px;">
+                        <i data-lucide="code" style="width: 12px; height: 12px;"></i> SCRIPT LOADER CODE
+                    </span>
+                </div>
+                <h3 id="modalScriptTitle" style="font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.4;">Script Title</h3>
+                <p id="lblLockerDesc" style="font-size: 13px; color: var(--text-muted); margin: 0;">Copy the loader code below and execute it directly in your Roblox executor:</p>
             </div>
 
-            <div class="tasks-stack" id="tasksStack">
-                <div class="task-step" id="task1Step">
-                    <div class="step-num" id="step1Num">1</div>
-                    <div class="step-info">
-                        <strong id="task1Text">Subscribe on YouTube</strong>
-                        <span id="task1Hint">Subscribe to @GhostSensix official channel</span>
-                    </div>
-                    <button class="btn-task" id="task1Btn">
-                        <span id="lblStep1">Subscribe</span> <i data-lucide="youtube" style="color: #ef4444;"></i>
-                    </button>
+            <div class="unlocked-view" id="unlockedView" style="display: block;">
+                <div class="code-box" style="margin-bottom: 14px; background: #080511; border: 1px solid #281b4b; border-radius: 10px; padding: 14px;">
+                    <pre style="margin: 0; max-height: 140px; overflow-y: auto;"><code id="scriptCodeBox" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #c084fc; word-break: break-all;">-- Loading...</code></pre>
                 </div>
-
-                <div class="task-step" id="task2Step">
-                    <div class="step-num" id="step2Num">2</div>
-                    <div class="step-info">
-                        <strong id="task2Text">Like & Watch Video</strong>
-                        <span id="task2Hint">Watch for 5 seconds to verify</span>
-                    </div>
-                    <button class="btn-task" id="task2Btn" disabled>
-                        <span id="lblStep2">Watch</span> <i data-lucide="thumbs-up"></i>
-                    </button>
-                </div>
-
-                <div class="task-step" id="task3Step">
-                    <div class="step-num" id="step3Num">3</div>
-                    <div class="step-info">
-                        <strong id="task3Text">Join Discord Community</strong>
-                        <span id="task3Hint">Join GhostSensix Discord</span>
-                    </div>
-                    <button class="btn-task" id="task3Btn" disabled>
-                        <span id="lblStep3">Join</span> <i data-lucide="message-square" style="color: #818cf8;"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="lock-indicator" id="lockedLabel">
-                <i data-lucide="lock" style="width: 14px; height: 14px;"></i>
-                <span id="lockedStatusText">Complete all 3 steps to unlock code</span>
-                <div class="task-dots">
-                    <span class="dot" id="dot1"></span>
-                    <span class="dot" id="dot2"></span>
-                    <span class="dot" id="dot3"></span>
-                </div>
-            </div>
-
-            <div class="unlocked-view" id="unlockedView" style="display: none;">
-                <div class="unlocked-badge">
-                    <i data-lucide="check-circle" style="color: #22c55e;"></i>
-                    <strong id="lblUnlockedTitle">Script Code Unlocked!</strong>
-                </div>
-                <p id="lblUnlockedDesc" style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">
-                    Copy the loader code below and execute it in your Roblox executor:
-                </p>
-                <div class="code-box">
-                    <pre><code id="scriptCodeBox">-- Loading...</code></pre>
-                </div>
-                <button class="btn-copy" id="btnCopyScript">
-                    <i data-lucide="copy"></i> <span id="lblBtnCopy">Copy Script</span>
+                <button class="btn-copy" id="btnCopyScript" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 10px; background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); color: #fff; border: none; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(168, 85, 247, 0.35);">
+                    <i data-lucide="copy" style="width: 16px; height: 16px;"></i> <span id="lblBtnCopy">Copy Script</span>
                 </button>
             </div>
         </div>
@@ -449,9 +499,13 @@
         </button>
     </nav>
 
+    <!-- Firebase SDK (v10 compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <!-- Core Scripts -->
     <script src="js/lucide.min.js"></script>
-    <script src="js/app.js?v=20261102_ghost_v2"></script>
+    <script src="js/app.js?v=20261102_ghost_v5"></script>
 </body>
 
 </html>

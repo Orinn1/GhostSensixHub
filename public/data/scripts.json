@@ -1,1 +1,15 @@
-[]
+﻿[
+  {
+    "id": "script_1793638324658",
+    "title": "Blox Fruits Script 🔥 FREE NO KEY! | Auto Farm + Halloween Update 🎃",
+    "game": "Blox Fruits",
+    "badge": "KEYLESS",
+    "thumbnail": "https://i.postimg.cc/C5tW4GLK/Neon-Halloween-Blox-Fruits-Script-Thumbnail.png",
+    "description": "",
+    "loadstring": "loadstring(game:HttpGet(\"https://h4xscripts.xyz/loader\"))()",
+    "isKeyless": true,
+    "isMobile": true,
+    "isPC": true,
+    "updatedAt": "2026-11-02T16:52:04.658Z"
+  }
+]

@@ -22,13 +22,13 @@
     "bypassMessage": "Please complete the sponsor check to unlock all scripts for 24 hours."
   },
   "firebaseConfig": {
-    "apiKey": "AIzaSyApTJf2qSiaaM3qQ9e2XE16Za1p3FGXpxI",
-    "authDomain": "blacklistscripts.firebaseapp.com",
-    "projectId": "blacklistscripts",
-    "storageBucket": "blacklistscripts.firebasestorage.app",
-    "messagingSenderId": "337802433479",
-    "appId": "1:337802433479:web:d0758311bfd6bd02983fe2",
-    "measurementId": "G-KJVSN73QYR"
+    "apiKey": "AIzaSyBCMSULoP-CnTWurWMTUKDfRMEEu2T7PVE",
+    "authDomain": "ghostsensi-1d96b.firebaseapp.com",
+    "projectId": "ghostsensi-1d96b",
+    "storageBucket": "ghostsensi-1d96b.firebasestorage.app",
+    "messagingSenderId": "311001384388",
+    "appId": "1:311001384388:web:55f087712d79ec79c45091",
+    "measurementId": "G-P3XDGNC8T"
   }
 }
 
