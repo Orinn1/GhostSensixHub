@@ -36,6 +36,7 @@ export async function onRequest(context) {
   const FIREBASE_API_KEY = 'AIzaSyBCMSULoP-CnTWurWMTUKDfRMEEu2T7PVE';
 
   if (uid) {
+    // 1. Save to GhostSensix Firestore
     try {
       const docUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/lootlabs_sessions/${encodeURIComponent(uid)}?key=${FIREBASE_API_KEY}`;
       await fetch(docUrl, {
@@ -52,6 +53,22 @@ export async function onRequest(context) {
     } catch (e) {
       console.warn('[GhostSensix] Postback save error:', e);
     }
+
+    // 2. Also sync to BlacklistScripts Firestore (Cross-site LootLabs sync)
+    try {
+      const blDocUrl = `https://firestore.googleapis.com/v1/projects/blacklistscripts/databases/(default)/documents/lootlabs_sessions/${encodeURIComponent(uid)}?key=AIzaSyApTJf2qSiaaM3qQ9e2XE16Za1p3FGXpxI`;
+      fetch(blDocUrl, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fields: {
+            verified: { booleanValue: true },
+            clickId: { stringValue: clickId },
+            verifiedAt: { integerValue: String(Date.now()) }
+          }
+        })
+      }).catch(() => {});
+    } catch (e) {}
   }
 
   return new Response(JSON.stringify({
