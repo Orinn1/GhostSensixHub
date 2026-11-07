@@ -57,7 +57,7 @@ export async function onRequest(context) {
     // 2. Also sync to BlacklistScripts Firestore (Cross-site LootLabs sync)
     try {
       const blDocUrl = `https://firestore.googleapis.com/v1/projects/blacklistscripts/databases/(default)/documents/lootlabs_sessions/${encodeURIComponent(uid)}?key=AIzaSyApTJf2qSiaaM3qQ9e2XE16Za1p3FGXpxI`;
-      fetch(blDocUrl, {
+      await fetch(blDocUrl, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -67,8 +67,10 @@ export async function onRequest(context) {
             verifiedAt: { integerValue: String(Date.now()) }
           }
         })
-      }).catch(() => {});
-    } catch (e) {}
+      });
+    } catch (e) {
+      console.warn('[GhostSensix] Blacklist sync error:', e);
+    }
   }
 
   return new Response(JSON.stringify({
