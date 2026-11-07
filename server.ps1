@@ -85,6 +85,7 @@ try {
             if ($rawPath -eq "/api/lootlabs-postback") {
                 $uid = if ($request.QueryString["uid"]) { $request.QueryString["uid"] } else { $request.QueryString["puid"] }
                 if (-not $uid) { $uid = $request.QueryString["session"] }
+                if (-not $uid) { $uid = $request.QueryString["click_id"] }
                 if ($uid) {
                     if ($Sessions.ContainsKey($uid)) {
                         $Sessions[$uid].verified = $true
