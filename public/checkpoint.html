@@ -205,15 +205,15 @@
       <div class="gateway-logo pulse-red">
         <i data-lucide="ban" style="width: 40px; height: 40px; color: var(--danger);"></i>
       </div>
-      <h1 style="color: #fca5a5;">⛔ ตรวจพบบายพาส (Bypass Detected!)</h1>
+      <h1 style="color: #fca5a5;">⛔ Bypass Attempt Detected!</h1>
       <p class="desc" style="color: #cbd5e1;">
-        ระบบตรวจจับได้ว่าคุณพยายามข้ามโฆษณา หรือใช้โปรแกรม/เว็บ Bypass (เช่น Ixcore)<br>
-        <strong>เซิร์ฟเวอร์ LootLabs ไม่ได้ส่งสัญญาณ Postback ยืนยันว่าคุณดูโฆษณาจริง ระบบจึงปฏิเสธการให้สิทธิ์!</strong>
+        Automated bypass tools (e.g. Ixcore, Bypass.city) were detected on this session.<br>
+        <strong>LootLabs servers did NOT send verified ad completion postback. Access is strictly denied!</strong>
       </p>
       <div class="session-badge" style="color: #f87171; border-color: rgba(239, 68, 68, 0.25);" id="lblBypassSession">Session: Blocked</div>
       <button class="btn-action btn-danger" onclick="window.location.href='/'">
         <i data-lucide="rotate-ccw" style="width: 18px; height: 18px;"></i>
-        กลับไปทำภารกิจใหม่ด้วยตนเอง (เปิดหน้าหลัก)
+        Complete Tasks Manually (Return to Hub)
       </button>
     </div>
 
@@ -226,14 +226,14 @@
       <div class="gateway-logo pulse-green">
         <i data-lucide="check" style="width: 40px; height: 40px; color: var(--success);"></i>
       </div>
-      <h1 style="color: #86efac;">✅ ยืนยันสิทธิ์สำเร็จ! (Verified)</h1>
+      <h1 style="color: #86efac;">✅ Verification Successful!</h1>
       <p class="desc" style="color: #cbd5e1;">
-        เซิร์ฟเวอร์ LootLabs ยืนยันข้อมูล Postback เรียบร้อยแล้ว ได้รับสิทธิ์เข้าใช้งาน GhostSensix Hub 24 ชั่วโมง
+        LootLabs Postback confirmed. You have been granted a 24-hour unlimited pass to GhostSensix Hub.
       </p>
       <div class="session-badge" style="color: #34d399; border-color: rgba(16, 185, 129, 0.25);" id="lblSuccessSession">Session: Verified</div>
       <button class="btn-action btn-primary" onclick="window.location.href='/'" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
         <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
-        เข้าสู่เว็บไซต์ GhostSensix ทันที
+        Enter GhostSensix Hub Now
       </button>
     </div>
 
@@ -325,3 +325,4 @@
   </script>
 </body>
 </html>
+

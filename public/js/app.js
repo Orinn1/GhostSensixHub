@@ -1180,7 +1180,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             <span>Waiting for LootLabs completion...</span>
                         </div>
                         <div style="font-size: 11.5px; color: #a79fc2; margin-top: 4px;">
-                            ทำภารกิจในแท็บใหม่ให้เสร็จ แล้วกลับมากดปุ่ม <b>"Check Status (ตรวจสอบสถานะทันที)"</b>
+                            Complete tasks in the new tab, then return and click <b>"Check Verification Status"</b>
                         </div>
                     `;
                     if (window.lucide && lucide.createIcons) lucide.createIcons();
@@ -1233,17 +1233,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                     alertBox.innerHTML = `
                         <div style="font-weight: 700; color: #f87171; display: flex; align-items: center; justify-content: center; gap: 6px;">
                             <i data-lucide="shield-alert" style="width: 16px; height: 16px;"></i>
-                            <span>⛔ ตรวจพบบายพาส หรือยังดูโฆษณาไม่สำเร็จ!</span>
+                            <span>⛔ Bypass Attempt Detected!</span>
                         </div>
                         <div style="font-size: 11.5px; color: #fca5a5; margin-top: 4px; line-height: 1.4;">
-                            ระบบยังไม่ได้รับข้อมูล Postback ยืนยันจาก LootLabs สำหรับเซสชันนี้<br>
-                            <span style="opacity: 0.9;">⚠️ ห้ามใช้บอท/เว็บ Bypass • กรุณาทำภารกิจผ่าน LootLabs ให้จบจริง</span>
+                            LootLabs postback has not been received for this session.<br>
+                            <span style="opacity: 0.9;">⚠️ Do not use bypass tools. Please complete sponsor tasks manually.</span>
                         </div>
                     `;
                     if (window.lucide && lucide.createIcons) lucide.createIcons();
                 }
 
-                showToast("⛔ ตรวจพบบายพาส! ยังไม่พบการยืนยันจาก LootLabs");
+                showToast("⛔ Bypass attempt detected! LootLabs postback not received.");
             }
             return false;
         }
@@ -1255,10 +1255,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 alertBox.innerHTML = `
                     <div style="font-weight: 700; color: #4ade80; display: flex; align-items: center; justify-content: center; gap: 6px;">
                         <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i>
-                        <span>ยืนยันสิทธิ์สำเร็จเรียบร้อย!</span>
+                        <span>Verification Successful!</span>
                     </div>
                     <div style="font-size: 11.5px; color: #bbf7d0; margin-top: 4px;">
-                        LootLabs Postback ยืนยันแล้ว • ปลดล็อคเข้าใช้งาน 24 ชั่วโมง
+                        LootLabs Postback confirmed • 24-Hour Access Pass Granted
                     </div>
                 `;
                 if (window.lucide && lucide.createIcons) lucide.createIcons();
