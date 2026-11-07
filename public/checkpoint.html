@@ -282,6 +282,22 @@
     }
 
     async function checkStatus(retryCount = 0) {
+      const clickTime = parseInt(localStorage.getItem('ghostsensix_gate_click_time') || localStorage.getItem('blacklist_gate_click_time') || sessionStorage.getItem('ghostsensix_gate_click_time') || '0', 10);
+      const elapsed = clickTime > 0 ? (Date.now() - clickTime) / 1000 : 0;
+      const hasClicked = (localStorage.getItem('ghostsensix_gate_clicked') === 'true') || (sessionStorage.getItem('ghostsensix_gate_clicked') === 'true');
+
+      // 1. ShrinkMe Time-Window Verification
+      if (hasClicked && clickTime > 0) {
+        if (elapsed < 20) {
+          showBypassState(`Bypass Attempt: Arrived in only ${Math.round(elapsed)}s (Minimum 20s required for ShrinkMe tasks)`);
+          return;
+        } else {
+          showSuccessState('ShrinkMe Verified');
+          return;
+        }
+      }
+
+      // 2. LootLabs Server Postback verification
       const params = new URLSearchParams(window.location.search);
       const sess = params.get('session') || params.get('uid') || params.get('verify') || localStorage.getItem('ghostsensix_gate_session') || localStorage.getItem('ghostsensix_lootlabs_puid');
       
@@ -314,13 +330,13 @@
         // Network latency buffer: LootLabs webhook might take 1-3 seconds to deliver
         if (retryCount < 5) {
           const lbl = document.getElementById('lblSession');
-          if (lbl) lbl.textContent = `Awaiting LootLabs postback verification... (${5 - retryCount}s)`;
+          if (lbl) lbl.textContent = `Awaiting verification... (${5 - retryCount}s)`;
           setTimeout(() => checkStatus(retryCount + 1), 1200);
           return;
         }
       }
 
-      showBypassState(sess);
+      showBypassState(sess || 'No Active Session');
     }
 
     document.getElementById('btnCheckStatus').addEventListener('click', checkStatus);

@@ -1155,21 +1155,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         const gatePasscodeInput = document.getElementById("gatePasscodeInput");
         const gateErrorMsg = document.getElementById("gateErrorMsg");
 
-        let lootlabsUrl = (siteConfig.lootlabsGate && (siteConfig.lootlabsGate.lootlabsUrl || siteConfig.lootlabsGate.shrinkmeUrl))
-            ? (siteConfig.lootlabsGate.lootlabsUrl || siteConfig.lootlabsGate.shrinkmeUrl).trim()
-            : "https://loot-link.com/s?example_ghostsensix";
+        const gateProvider = (siteConfig.lootlabsGate && siteConfig.lootlabsGate.provider) || "shrinkme";
+        const isShrinkMe = gateProvider === "shrinkme";
 
-        lootlabsUrl = lootlabsUrl.replace(/[?&]puid=[^&]+/, '').replace(/[?&]uid=[^&]+/, '');
-        const sep = lootlabsUrl.includes("?") ? "&" : "?";
-        const finalGateUrl = `${lootlabsUrl}${sep}uid=${encodeURIComponent(puid)}&puid=${encodeURIComponent(puid)}`;
+        let gateUrl = "";
+        if (isShrinkMe) {
+            gateUrl = (siteConfig.lootlabsGate && siteConfig.lootlabsGate.shrinkmeUrl) || "https://shrinkme.click/q5uoZE0";
+        } else {
+            let lootlabsUrl = (siteConfig.lootlabsGate && (siteConfig.lootlabsGate.lootlabsUrl || siteConfig.lootlabsGate.shrinkmeUrl))
+                ? (siteConfig.lootlabsGate.lootlabsUrl || siteConfig.lootlabsGate.shrinkmeUrl).trim()
+                : "https://loot-link.com/s?M4EpkVwf";
+            lootlabsUrl = lootlabsUrl.replace(/[?&]puid=[^&]+/, '').replace(/[?&]uid=[^&]+/, '');
+            const sep = lootlabsUrl.includes("?") ? "&" : "?";
+            gateUrl = `${lootlabsUrl}${sep}uid=${encodeURIComponent(puid)}&puid=${encodeURIComponent(puid)}`;
+        }
 
         if (btnGateUnlock) {
-            btnGateUnlock.href = finalGateUrl;
+            btnGateUnlock.href = gateUrl;
             btnGateUnlock.target = "_blank";
             btnGateUnlock.addEventListener("click", () => {
                 localStorage.setItem("ghostsensix_gate_clicked", "true");
                 localStorage.setItem("ghostsensix_gate_click_time", String(Date.now()));
                 sessionStorage.setItem("ghostsensix_gate_clicked", "true");
+                sessionStorage.setItem("ghostsensix_gate_click_time", String(Date.now()));
                 
                 if (alertBox) {
                     alertBox.className = "gate-bypass-alert-box state-waiting";
@@ -1177,10 +1185,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     alertBox.innerHTML = `
                         <div style="font-weight: 600; color: #c084fc; display: flex; align-items: center; justify-content: center; gap: 8px;">
                             <span class="gate-spinner"></span>
-                            <span>Waiting for LootLabs completion...</span>
+                            <span>Waiting for ${isShrinkMe ? 'ShrinkMe' : 'LootLabs'} completion...</span>
                         </div>
                         <div style="font-size: 11.5px; color: #a79fc2; margin-top: 4px;">
-                            Complete tasks in the new tab, then return and click <b>"Check Verification Status"</b>
+                            Complete tasks in the new tab (~25s), then return and click <b>"Check Verification Status"</b>
                         </div>
                     `;
                     if (window.lucide && lucide.createIcons) lucide.createIcons();
@@ -1188,10 +1196,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
 
-        // Anti-Bypass Verification Function (Server-Side Postback)
+        // Anti-Bypass Verification Function (Supports ShrinkMe Time-Window & LootLabs Server Postback)
         async function verifyGhostGateSession(silent = false) {
+            const clickTime = parseInt(localStorage.getItem("ghostsensix_gate_click_time") || sessionStorage.getItem("ghostsensix_gate_click_time") || "0", 10);
+            const elapsed = clickTime > 0 ? (Date.now() - clickTime) / 1000 : 0;
+            const hasClicked = (localStorage.getItem("ghostsensix_gate_clicked") === "true") || (sessionStorage.getItem("ghostsensix_gate_clicked") === "true");
+
+            // 1. ShrinkMe Time-Window Challenge
+            if (isShrinkMe) {
+                if (!hasClicked || clickTime === 0) {
+                    if (!silent) showBypassError("Please click the 'Unlock Access' button first to complete ShrinkMe sponsor tasks!");
+                    return false;
+                }
+                if (elapsed < 20) {
+                    if (!silent) showBypassError(`⛔ Bypass Detected! You completed it in only ${Math.round(elapsed)}s (Minimum 20s required for ShrinkMe). Do not use bypass tools!`);
+                    return false;
+                }
+                handleVerifiedSuccess("ShrinkMe verified • 24-Hour Access Pass Granted");
+                return true;
+            }
+
+            // 2. LootLabs Server-to-Server Postback
             try {
-                // 1. Check server endpoint (/api/checkpoint/status or /api/check-session)
+                // Check server endpoint (/api/checkpoint/status or /api/check-session)
                 let res = await fetch(`/api/checkpoint/status?session=${encodeURIComponent(puid)}`).catch(() => null);
                 if (!res || !res.ok) {
                     res = await fetch(`/api/check-session?puid=${encodeURIComponent(puid)}`).catch(() => null);
@@ -1199,18 +1226,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (res && res.ok) {
                     const data = await res.json();
                     if (data && data.verified) {
-                        handleVerifiedSuccess();
+                        handleVerifiedSuccess("LootLabs Postback confirmed • 24-Hour Access Pass Granted");
                         return true;
                     }
                 }
 
-                // 2. Check directly with Firebase Firestore fallback
+                // Check directly with Firebase Firestore fallback
                 const fbUrl = `https://firestore.googleapis.com/v1/projects/ghostsensi-1d96b/databases/(default)/documents/lootlabs_sessions/${encodeURIComponent(puid)}?key=AIzaSyBCMSULoP-CnTWurWMTUKDfRMEEu2T7PVE`;
                 const fbRes = await fetch(fbUrl).catch(() => null);
                 if (fbRes && fbRes.ok) {
                     const fbData = await fbRes.json();
                     if (fbData.fields && fbData.fields.verified && fbData.fields.verified.booleanValue === true) {
-                        handleVerifiedSuccess();
+                        handleVerifiedSuccess("LootLabs Postback confirmed • 24-Hour Access Pass Granted");
                         return true;
                     }
                 }
@@ -1220,35 +1247,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // If NOT verified by LootLabs Postback
             if (!silent) {
-                if (gateStage) {
-                    gateStage.classList.remove("gate-shake");
-                    void gateStage.offsetWidth; // trigger reflow
-                    gateStage.classList.add("gate-shake");
-                    setTimeout(() => gateStage.classList.remove("gate-shake"), 600);
-                }
-
-                if (alertBox) {
-                    alertBox.className = "gate-bypass-alert-box state-error";
-                    alertBox.style.display = "block";
-                    alertBox.innerHTML = `
-                        <div style="font-weight: 700; color: #f87171; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                            <i data-lucide="shield-alert" style="width: 16px; height: 16px;"></i>
-                            <span>⛔ Bypass Attempt Detected!</span>
-                        </div>
-                        <div style="font-size: 11.5px; color: #fca5a5; margin-top: 4px; line-height: 1.4;">
-                            LootLabs postback has not been received for this session.<br>
-                            <span style="opacity: 0.9;">⚠️ Do not use bypass tools. Please complete sponsor tasks manually.</span>
-                        </div>
-                    `;
-                    if (window.lucide && lucide.createIcons) lucide.createIcons();
-                }
-
-                showToast("⛔ Bypass attempt detected! LootLabs postback not received.");
+                showBypassError("LootLabs postback has not been received for this session.<br><span style='opacity: 0.9;'>⚠️ Do not use bypass tools. Please complete sponsor tasks manually.</span>");
             }
             return false;
         }
 
-        function handleVerifiedSuccess() {
+        function showBypassError(msg) {
+            if (gateStage) {
+                gateStage.classList.remove("gate-shake");
+                void gateStage.offsetWidth; // trigger reflow
+                gateStage.classList.add("gate-shake");
+                setTimeout(() => gateStage.classList.remove("gate-shake"), 600);
+            }
+
+            if (alertBox) {
+                alertBox.className = "gate-bypass-alert-box state-error";
+                alertBox.style.display = "block";
+                alertBox.innerHTML = `
+                    <div style="font-weight: 700; color: #f87171; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <i data-lucide="shield-alert" style="width: 16px; height: 16px;"></i>
+                        <span>⛔ Bypass Attempt Detected!</span>
+                    </div>
+                    <div style="font-size: 11.5px; color: #fca5a5; margin-top: 4px; line-height: 1.4;">
+                        ${msg}
+                    </div>
+                `;
+                if (window.lucide && lucide.createIcons) lucide.createIcons();
+            }
+
+            showToast("⛔ Bypass attempt detected! Access denied.");
+        }
+
+        function handleVerifiedSuccess(subtitle = "Verification Successful • 24-Hour Access Pass Granted") {
             if (alertBox) {
                 alertBox.className = "gate-bypass-alert-box state-success";
                 alertBox.style.display = "block";
@@ -1258,7 +1288,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <span>Verification Successful!</span>
                     </div>
                     <div style="font-size: 11.5px; color: #bbf7d0; margin-top: 4px;">
-                        LootLabs Postback confirmed • 24-Hour Access Pass Granted
+                        ${subtitle}
                     </div>
                 `;
                 if (window.lucide && lucide.createIcons) lucide.createIcons();
