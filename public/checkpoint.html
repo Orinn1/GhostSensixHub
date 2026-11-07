@@ -281,13 +281,12 @@
       }, 1500);
     }
 
-    async function checkStatus() {
+    async function checkStatus(retryCount = 0) {
       const params = new URLSearchParams(window.location.search);
       const sess = params.get('session') || params.get('uid') || params.get('verify') || localStorage.getItem('ghostsensix_gate_session') || localStorage.getItem('ghostsensix_lootlabs_puid');
       
       if (sess) {
         currentSessionId = sess;
-        document.getElementById('lblSession').textContent = 'Session: ' + sess;
         try {
           const res = await fetch(`/api/checkpoint/status?session=${encodeURIComponent(sess)}`);
           if (res.ok) {
@@ -311,6 +310,14 @@
             }
           }
         } catch (fbErr) {}
+
+        // Network latency buffer: LootLabs webhook might take 1-3 seconds to deliver
+        if (retryCount < 5) {
+          const lbl = document.getElementById('lblSession');
+          if (lbl) lbl.textContent = `Awaiting LootLabs postback verification... (${5 - retryCount}s)`;
+          setTimeout(() => checkStatus(retryCount + 1), 1200);
+          return;
+        }
       }
 
       showBypassState(sess);
