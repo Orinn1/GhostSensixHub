@@ -25,6 +25,8 @@ $mimeTypes = @{
     ".webp" = "image/webp"
 }
 
+$Sessions = [hashtable]::Synchronized(@{})
+
 try {
     while ($listener.IsListening) {
         try {
@@ -35,6 +37,7 @@ try {
             $rawPath = $request.Url.LocalPath
             if ($rawPath -eq "/") { $rawPath = "/index.html" }
             if ($rawPath -eq "/admin" -or $rawPath -eq "/admin/") { $rawPath = "/admin.html" }
+            if ($rawPath -eq "/access" -or $rawPath -eq "/checkpoint") { $rawPath = "/checkpoint.html" }
 
             # Set CORS & prevent browser cache during development
             $response.Headers.Add("Access-Control-Allow-Origin", "*")
@@ -44,6 +47,69 @@ try {
 
             if ($request.HttpMethod -eq "OPTIONS") {
                 $response.StatusCode = 200
+                $response.Close()
+                continue
+            }
+
+            # Checkpoint: Create Session
+            if ($rawPath -eq "/api/checkpoint/create") {
+                $rnd = [System.IO.Path]::GetRandomFileName().Replace('.', '').Substring(0, 8).ToUpper()
+                $sessId = "GHOST_$rnd"
+                $Sessions[$sessId] = @{ verified = $false; createdAt = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() }
+                $ans = '{"success":true,"sessionId":"' + $sessId + '"}'
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes($ans)
+                $response.ContentType = "application/json"
+                $response.StatusCode = 200
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.Close()
+                continue
+            }
+
+            # Checkpoint: Check Status (/api/checkpoint/status or /api/check-session)
+            if ($rawPath -eq "/api/checkpoint/status" -or $rawPath -eq "/api/check-session") {
+                $s = if ($request.QueryString["session"]) { $request.QueryString["session"] } else { $request.QueryString["puid"] }
+                $isVerified = $false
+                if ($s -and $Sessions.ContainsKey($s)) {
+                    $isVerified = [bool]$Sessions[$s].verified
+                }
+                $ans = '{"sessionId":"' + $s + '","puid":"' + $s + '","verified":' + ($isVerified.ToString().ToLower()) + '}'
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes($ans)
+                $response.ContentType = "application/json"
+                $response.StatusCode = 200
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.Close()
+                continue
+            }
+
+            # LootLabs Postback Webhook Endpoint
+            if ($rawPath -eq "/api/lootlabs-postback") {
+                $uid = if ($request.QueryString["uid"]) { $request.QueryString["uid"] } else { $request.QueryString["puid"] }
+                if (-not $uid) { $uid = $request.QueryString["session"] }
+                if ($uid) {
+                    if ($Sessions.ContainsKey($uid)) {
+                        $Sessions[$uid].verified = $true
+                        $Sessions[$uid].paidAt = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+                    } else {
+                        $Sessions[$uid] = @{ verified = $true; paidAt = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() }
+                    }
+                }
+                $ans = '{"status":"ok","message":"LootLabs postback credited successfully","uid":"' + $uid + '","verified":true}'
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes($ans)
+                $response.ContentType = "application/json"
+                $response.StatusCode = 200
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.Close()
+                continue
+            }
+
+            # Reset Device Test
+            if ($rawPath -eq "/api/reset-device-test") {
+                $Sessions.Clear()
+                $ans = '{"success":true,"message":"Sessions cleared"}'
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes($ans)
+                $response.ContentType = "application/json"
+                $response.StatusCode = 200
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
                 $response.Close()
                 continue
             }

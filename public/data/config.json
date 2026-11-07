@@ -17,9 +17,10 @@
     "discord": "https://discord.gg/6MTUP78KF6"
   },
   "lootlabsGate": {
-    "provider": "shrinkme",
+    "provider": "lootlabs",
+    "lootlabsUrl": "https://loot-link.com/s?example_ghostsensix",
     "shrinkmeUrl": "https://shrinkme.click/q5uoZE0",
-    "bypassMessage": "Please complete the sponsor check to unlock all scripts for 24 hours."
+    "bypassMessage": "Please complete LootLabs verification to unlock all GhostSensix scripts for 24 hours."
   },
   "firebaseConfig": {
     "apiKey": "AIzaSyBCMSULoP-CnTWurWMTUKDfRMEEu2T7PVE",

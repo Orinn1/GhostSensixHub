@@ -53,30 +53,13 @@
                 if (params.has("lock") || params.has("reset") || params.has("relock") || params.has("test")) {
                     localStorage.removeItem("ghostsensix_gate_pass");
                     sessionStorage.removeItem("ghostsensix_gate_pass");
-                    localStorage.removeItem("ghostsensix_gate_clicked");
-                    localStorage.removeItem("ghostsensix_gate_click_time");
+                    localStorage.removeItem("ghostsensix_gate_session");
+                    localStorage.removeItem("ghostsensix_lootlabs_puid");
                     document.documentElement.classList.add("gate-active-init");
                     return;
                 }
 
-                // 2. Incoming Pass Token check (when redirected back from ShrinkMe)
-                const passToken = params.get("pass_token") || params.get("token") || params.get("key") || params.get("auth") || params.get("verified");
-                const ref = (document.referrer || "").toLowerCase();
-                const isFromShortener = ref.includes("shrinkme") || ref.includes("shrinkearn") || ref.includes("srnky") || ref.includes("shrinkforearn");
-
-                if (passToken || isFromShortener) {
-                    const expiry = Date.now() + 24 * 60 * 60 * 1000;
-                    localStorage.setItem("ghostsensix_gate_pass", String(expiry));
-                    sessionStorage.setItem("ghostsensix_gate_pass", String(expiry));
-                    document.documentElement.classList.remove("gate-active-init");
-                    try {
-                        const cleanUrl = window.location.origin + window.location.pathname;
-                        window.history.replaceState({}, document.title, cleanUrl);
-                    } catch (e) {}
-                    return;
-                }
-
-                // 3. Normal check: is device already remembered for 24 hours?
+                // 2. Normal check: is device already remembered for 24 hours?
                 const passExpiry = localStorage.getItem("ghostsensix_gate_pass") || sessionStorage.getItem("ghostsensix_gate_pass");
                 const now = Date.now();
                 if (!passExpiry || now > parseInt(passExpiry, 10)) {
@@ -139,10 +122,19 @@
 
             <!-- Action Buttons -->
             <div class="gate-actions-row">
-                <a href="https://shrinkme.click/q5uoZE0" target="_blank" class="gate-btn-primary" id="btnGateUnlock">
-                    <i data-lucide="external-link" style="width: 16px; height: 16px;"></i> Unlock Access (Free)
+                <a href="https://loot-link.com/s?example_ghostsensix" target="_blank" class="gate-btn-primary" id="btnGateUnlock">
+                    <i data-lucide="external-link" style="width: 16px; height: 16px;"></i> Unlock Access (LootLabs 24h)
                 </a>
             </div>
+
+            <!-- Anti-Bypass Status Alert Box (Waiting / Bypass Error / Success) -->
+            <div id="gateBypassAlertBox" class="gate-bypass-alert-box" style="display: none;"></div>
+
+            <!-- Check Status Button -->
+            <button type="button" id="btnGateCheckStatus" class="btn-gate-check">
+                <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+                <span>Check Status (ตรวจสอบสถานะทันที)</span>
+            </button>
 
 
 

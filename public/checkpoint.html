@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GhostSensix &mdash; Anti-Bypass Security Checkpoint</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Kanit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg: #080511;
+      --card-bg: rgba(18, 12, 36, 0.92);
+      --border: rgba(168, 85, 247, 0.25);
+      --primary: #a855f7;
+      --primary-glow: rgba(168, 85, 247, 0.4);
+      --cyan: #38bdf8;
+      --cyan-glow: rgba(56, 189, 248, 0.35);
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.35);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.35);
+      --text: #f5f2fc;
+      --text-muted: #a79fc2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', 'Kanit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+      background-image: radial-gradient(circle at 50% 15%, rgba(168, 85, 247, 0.18) 0%, rgba(8, 5, 17, 0.98) 75%);
+    }
+    .checkpoint-container {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px 30px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 50px rgba(168, 85, 247, 0.2);
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .gateway-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.5px;
+      margin-bottom: 22px;
+    }
+    .gateway-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 2px solid var(--border);
+      position: relative;
+      box-shadow: 0 0 30px var(--primary-glow);
+    }
+    .gateway-logo img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+    }
+    .gateway-logo.pulse-purple {
+      border-color: var(--primary);
+      box-shadow: 0 0 35px var(--primary-glow);
+    }
+    .gateway-logo.pulse-red {
+      border-color: var(--danger);
+      box-shadow: 0 0 35px var(--danger-glow);
+      background: rgba(239, 68, 68, 0.1);
+    }
+    .gateway-logo.pulse-green {
+      border-color: var(--success);
+      box-shadow: 0 0 35px var(--success-glow);
+      background: rgba(16, 185, 129, 0.1);
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.3px;
+    }
+    .desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .session-badge {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--cyan);
+      margin-bottom: 22px;
+      word-break: break-all;
+    }
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%);
+      color: #fff;
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 0 35px rgba(192, 132, 252, 0.8);
+      transform: translateY(-2px);
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #fff;
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
+    }
+    .btn-danger:hover {
+      box-shadow: 0 0 35px rgba(239, 68, 68, 0.6);
+      transform: translateY(-2px);
+    }
+    .security-specs {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 12px;
+      color: #8c82a8;
+    }
+    .security-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="checkpoint-container" id="mainCard">
+    <!-- State 1: Default / Checking -->
+    <div id="stateDefault">
+      <div class="gateway-badge">
+        <i data-lucide="shield-check" style="width: 14px; height: 14px; color: #a855f7;"></i>
+        Anti-Bypass Security Checkpoint
+      </div>
+      <div class="gateway-logo pulse-purple">
+        <img src="Logo.png" alt="GhostSensix">
+      </div>
+      <h1>Verifying Access Ticket...</h1>
+      <p class="desc">
+        Checking server-side cryptographic verification and LootLabs ad postback status.
+      </p>
+      <div class="session-badge" id="lblSession">Session: Checking...</div>
+      <button class="btn-action btn-primary" id="btnCheckStatus">
+        <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+        Check Verification Status
+      </button>
+    </div>
+
+    <!-- State 2: Bypass Detected (RED) -->
+    <div id="stateBypass" style="display: none;">
+      <div class="gateway-badge" style="background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.35); color: var(--danger);">
+        <i data-lucide="shield-alert" style="width: 14px; height: 14px;"></i>
+        Bypass Attempt Blocked
+      </div>
+      <div class="gateway-logo pulse-red">
+        <i data-lucide="ban" style="width: 40px; height: 40px; color: var(--danger);"></i>
+      </div>
+      <h1 style="color: #fca5a5;">⛔ ตรวจพบบายพาส (Bypass Detected!)</h1>
+      <p class="desc" style="color: #cbd5e1;">
+        ระบบตรวจจับได้ว่าคุณพยายามข้ามโฆษณา หรือใช้โปรแกรม/เว็บ Bypass (เช่น Ixcore)<br>
+        <strong>เซิร์ฟเวอร์ LootLabs ไม่ได้ส่งสัญญาณ Postback ยืนยันว่าคุณดูโฆษณาจริง ระบบจึงปฏิเสธการให้สิทธิ์!</strong>
+      </p>
+      <div class="session-badge" style="color: #f87171; border-color: rgba(239, 68, 68, 0.25);" id="lblBypassSession">Session: Blocked</div>
+      <button class="btn-action btn-danger" onclick="window.location.href='/'">
+        <i data-lucide="rotate-ccw" style="width: 18px; height: 18px;"></i>
+        กลับไปทำภารกิจใหม่ด้วยตนเอง (เปิดหน้าหลัก)
+      </button>
+    </div>
+
+    <!-- State 3: Verified Success (GREEN) -->
+    <div id="stateSuccess" style="display: none;">
+      <div class="gateway-badge" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.35); color: var(--success);">
+        <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
+        Verified &bull; Access Granted
+      </div>
+      <div class="gateway-logo pulse-green">
+        <i data-lucide="check" style="width: 40px; height: 40px; color: var(--success);"></i>
+      </div>
+      <h1 style="color: #86efac;">✅ ยืนยันสิทธิ์สำเร็จ! (Verified)</h1>
+      <p class="desc" style="color: #cbd5e1;">
+        เซิร์ฟเวอร์ LootLabs ยืนยันข้อมูล Postback เรียบร้อยแล้ว ได้รับสิทธิ์เข้าใช้งาน GhostSensix Hub 24 ชั่วโมง
+      </p>
+      <div class="session-badge" style="color: #34d399; border-color: rgba(16, 185, 129, 0.25);" id="lblSuccessSession">Session: Verified</div>
+      <button class="btn-action btn-primary" onclick="window.location.href='/'" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+        เข้าสู่เว็บไซต์ GhostSensix ทันที
+      </button>
+    </div>
+
+    <!-- Security Badges Footer -->
+    <div class="security-specs">
+      <div class="security-item">
+        <i data-lucide="cpu" style="width: 13px; height: 13px;"></i>
+        HMAC-SHA256
+      </div>
+      <div class="security-item">
+        <i data-lucide="radio" style="width: 13px; height: 13px;"></i>
+        LootLabs Postback
+      </div>
+      <div class="security-item">
+        <i data-lucide="shield" style="width: 13px; height: 13px;"></i>
+        Zero-Bypass
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSessionId = '';
+
+    function showBypassState(sessionId) {
+      document.getElementById('stateDefault').style.display = 'none';
+      document.getElementById('stateSuccess').style.display = 'none';
+      document.getElementById('stateBypass').style.display = 'block';
+      document.getElementById('lblBypassSession').textContent = 'Session: ' + (sessionId || 'Bypasser Detected') + ' (Blocked)';
+      lucide.createIcons();
+    }
+
+    function showSuccessState(sessionId) {
+      document.getElementById('stateDefault').style.display = 'none';
+      document.getElementById('stateBypass').style.display = 'none';
+      document.getElementById('stateSuccess').style.display = 'block';
+      document.getElementById('lblSuccessSession').textContent = 'Session: ' + (sessionId || 'Verified');
+      
+      const expiry = Date.now() + (24 * 60 * 60 * 1000);
+      localStorage.setItem('ghostsensix_gate_pass', String(expiry));
+      sessionStorage.setItem('ghostsensix_gate_pass', String(expiry));
+      lucide.createIcons();
+
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1500);
+    }
+
+    async function checkStatus() {
+      const params = new URLSearchParams(window.location.search);
+      const sess = params.get('session') || params.get('uid') || params.get('verify') || localStorage.getItem('ghostsensix_gate_session') || localStorage.getItem('ghostsensix_lootlabs_puid');
+      
+      if (sess) {
+        currentSessionId = sess;
+        document.getElementById('lblSession').textContent = 'Session: ' + sess;
+        try {
+          const res = await fetch(`/api/checkpoint/status?session=${encodeURIComponent(sess)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.verified) {
+              showSuccessState(sess);
+              return;
+            }
+          }
+        } catch (e) {}
+
+        // Fallback check directly to Firestore
+        try {
+          const fbUrl = `https://firestore.googleapis.com/v1/projects/ghostsensi-1d96b/databases/(default)/documents/lootlabs_sessions/${encodeURIComponent(sess)}?key=AIzaSyBCMSULoP-CnTWurWMTUKDfRMEEu2T7PVE`;
+          const fbRes = await fetch(fbUrl);
+          if (fbRes.ok) {
+            const fbData = await fbRes.json();
+            if (fbData.fields && fbData.fields.verified && fbData.fields.verified.booleanValue === true) {
+              showSuccessState(sess);
+              return;
+            }
+          }
+        } catch (fbErr) {}
+      }
+
+      showBypassState(sess);
+    }
+
+    document.getElementById('btnCheckStatus').addEventListener('click', checkStatus);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      checkStatus();
+    });
+  </script>
+</body>
+</html>
