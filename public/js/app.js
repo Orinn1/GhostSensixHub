@@ -1070,6 +1070,44 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const urlParams = new URLSearchParams(window.location.search);
 
+        // 0. Auto-unlock if coming from GateFlow / Sub2Unlock
+        const passToken = urlParams.get("pass_token") || "";
+        const authParam = urlParams.get("auth") || "";
+        const vipParam = urlParams.get("vip") || "";
+
+        if (passToken === "gateflow_24h" || passToken.startsWith("gateflow")) {
+            unlockGate(24, true);
+            try {
+                const cleanUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+            } catch (e) {}
+            return;
+        }
+
+        if (authParam === "ghost_vip" || authParam === "blacklist_vip" || vipParam === "1") {
+            unlockGate(720, true);
+            try {
+                const cleanUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+            } catch (e) {}
+            return;
+        }
+
+        const incomingHash = urlParams.get("hash");
+        if (incomingHash && incomingHash.length > 20) {
+            fetch(`/api/linkvertise/verify?hash=${encodeURIComponent(incomingHash)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.verified) {
+                        handleVerifiedSuccess("Linkvertise Anti-Bypass verified! Access granted for 24h.");
+                        try {
+                            const cleanUrl = window.location.origin + window.location.pathname;
+                            window.history.replaceState({}, document.title, cleanUrl);
+                        } catch (e) {}
+                    }
+                }).catch(err => console.warn("Hash verify error:", err));
+        }
+
         // Helper: Unlock gate and save 24-hour session
         function unlockGate(hours = 24, showUnlockedToast = true) {
             const expiryTime = Date.now() + hours * 60 * 60 * 1000;
@@ -1155,11 +1193,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         const gatePasscodeInput = document.getElementById("gatePasscodeInput");
         const gateErrorMsg = document.getElementById("gateErrorMsg");
 
-        const gateProvider = (siteConfig.lootlabsGate && siteConfig.lootlabsGate.provider) || "shrinkme";
+        const gateProvider = (siteConfig.lootlabsGate && siteConfig.lootlabsGate.provider) || "linkvertise";
+        const isLinkvertise = gateProvider === "linkvertise";
         const isShrinkMe = gateProvider === "shrinkme";
 
         let gateUrl = "";
-        if (isShrinkMe) {
+        if (isLinkvertise) {
+            gateUrl = (siteConfig.lootlabsGate && siteConfig.lootlabsGate.linkvertiseUrl) || "https://link-hub.net/3335115/38FigSNb0zHg";
+        } else if (isShrinkMe) {
             gateUrl = (siteConfig.lootlabsGate && siteConfig.lootlabsGate.shrinkmeUrl) || "https://shrinkme.click/q5uoZE0";
         } else {
             let lootlabsUrl = (siteConfig.lootlabsGate && (siteConfig.lootlabsGate.lootlabsUrl || siteConfig.lootlabsGate.shrinkmeUrl))
@@ -1185,10 +1226,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     alertBox.innerHTML = `
                         <div style="font-weight: 600; color: #c084fc; display: flex; align-items: center; justify-content: center; gap: 8px;">
                             <span class="gate-spinner"></span>
-                            <span>Waiting for ${isShrinkMe ? 'ShrinkMe' : 'LootLabs'} completion...</span>
+                            <span>Waiting for ${isLinkvertise ? 'Linkvertise' : isShrinkMe ? 'ShrinkMe' : 'LootLabs'} completion...</span>
                         </div>
                         <div style="font-size: 11.5px; color: #a79fc2; margin-top: 4px;">
-                            Complete tasks in the new tab (~25s), then return and click <b>"Check Verification Status"</b>
+                            Complete tasks in the new tab (~20s), then return and click <b>"Check Verification Status"</b>
                         </div>
                     `;
                     if (window.lucide && lucide.createIcons) lucide.createIcons();
@@ -1196,13 +1237,27 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
 
-        // Anti-Bypass Verification Function (Supports ShrinkMe Time-Window & LootLabs Server Postback)
+        // Anti-Bypass Verification Function (Supports Linkvertise, ShrinkMe & LootLabs)
         async function verifyGhostGateSession(silent = false) {
             const clickTime = parseInt(localStorage.getItem("ghostsensix_gate_click_time") || sessionStorage.getItem("ghostsensix_gate_click_time") || "0", 10);
             const elapsed = clickTime > 0 ? (Date.now() - clickTime) / 1000 : 0;
             const hasClicked = (localStorage.getItem("ghostsensix_gate_clicked") === "true") || (sessionStorage.getItem("ghostsensix_gate_clicked") === "true");
 
-            // 1. ShrinkMe Time-Window Challenge
+            // 1. Linkvertise Time-Window & Click Challenge
+            if (isLinkvertise) {
+                if (!hasClicked || clickTime === 0) {
+                    if (!silent) showBypassError("Please click the 'Unlock Access' button first to complete Linkvertise sponsor tasks!");
+                    return false;
+                }
+                if (elapsed < 15) {
+                    if (!silent) showBypassError(`⛔ Bypass Detected! You completed it in only ${Math.round(elapsed)}s (Minimum 15s required for Linkvertise). Do not use bypass tools!`);
+                    return false;
+                }
+                handleVerifiedSuccess("Linkvertise verified • 24-Hour Access Pass Granted");
+                return true;
+            }
+
+            // 2. ShrinkMe Time-Window Challenge
             if (isShrinkMe) {
                 if (!hasClicked || clickTime === 0) {
                     if (!silent) showBypassError("Please click the 'Unlock Access' button first to complete ShrinkMe sponsor tasks!");

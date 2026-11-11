@@ -245,6 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
     trackGateEvent(slug, 'click');
   }
 
+  if (params.get('hash')) {
+    showToast('✅ Passed Linkvertise! Please complete the support steps below to enter the website.', 'success', 5000);
+  }
+
   if (slug && slug !== 'hub-access') {
     loadLockerBySlug(slug);
   } else {

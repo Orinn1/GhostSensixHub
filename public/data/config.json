@@ -17,10 +17,13 @@
     "discord": "https://discord.gg/6MTUP78KF6"
   },
   "lootlabsGate": {
-    "provider": "shrinkme",
+    "enabled": true,
+    "provider": "linkvertise",
+    "linkvertiseUrl": "https://link-hub.net/3335115/38FigSNb0zHg",
+    "linkvertiseToken": "51fdfa2e4968abbf74a67de73fe63cefbe2cd2e1802bd67af651d4fa88aec7e7",
     "lootlabsUrl": "https://loot-link.com/s?M4EpkVwf",
     "shrinkmeUrl": "https://shrinkme.click/q5uoZE0",
-    "bypassMessage": "Please complete ShrinkMe sponsor verification to unlock all GhostSensix scripts for 24 hours."
+    "bypassMessage": "Please complete Linkvertise sponsor verification to unlock all GhostSensix scripts for 24 hours."
   },
   "firebaseConfig": {
     "apiKey": "AIzaSyBCMSULoP-CnTWurWMTUKDfRMEEu2T7PVE",

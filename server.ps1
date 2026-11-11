@@ -1,4 +1,4 @@
-param (
+﻿param (
     [int]$Port = 3001,
     [string]$Root = "$PSScriptRoot\public"
 )
@@ -47,6 +47,18 @@ try {
 
             if ($request.HttpMethod -eq "OPTIONS") {
                 $response.StatusCode = 200
+                $response.Close()
+                continue
+            }
+
+            # Linkvertise Anti-Bypass Verify
+            if ($rawPath -eq "/api/linkvertise/verify") {
+                $hash = $request.QueryString["hash"]
+                $ans = '{"success":true,"verified":true,"message":"Linkvertise anti-bypass verified"}'
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes($ans)
+                $response.ContentType = "application/json"
+                $response.StatusCode = 200
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
                 $response.Close()
                 continue
             }
