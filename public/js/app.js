@@ -613,6 +613,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                         btnCopyScript.innerHTML = originalHtml;
                         refreshIcons();
                     }, 2000);
+
+                    // Smart Copy Sponsor (Max once per 24h)
+                    try {
+                        const lastCopyAd = parseInt(localStorage.getItem("ghostsensix_last_copy_sponsor") || "0", 10);
+                        const now = Date.now();
+                        if (now - lastCopyAd > 24 * 60 * 60 * 1000) {
+                            localStorage.setItem("ghostsensix_last_copy_sponsor", String(now));
+                            const copySponsor = "https://omg10.com/4/11911452";
+                            setTimeout(() => {
+                                try { window.open(copySponsor, "_blank"); } catch (e) {}
+                            }, 350);
+                        }
+                    } catch (err) {}
                 }).catch(() => {});
             }
         });
