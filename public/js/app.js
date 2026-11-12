@@ -1193,7 +1193,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const gatePasscodeInput = document.getElementById("gatePasscodeInput");
         const gateErrorMsg = document.getElementById("gateErrorMsg");
 
-        const gateProvider = (siteConfig.lootlabsGate && siteConfig.lootlabsGate.provider) || "linkvertise";
+        const gateProvider = (siteConfig.lootlabsGate && siteConfig.lootlabsGate.provider) || "lootlabs";
         const isLinkvertise = gateProvider === "linkvertise";
         const isShrinkMe = gateProvider === "shrinkme";
 
