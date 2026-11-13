@@ -128,11 +128,9 @@
                 </a>
             </div>
 
-            <!-- Anti-Bypass Status Alert Box (Waiting / Bypass Error / Success) -->
-            <div id="gateBypassAlertBox" class="gate-bypass-alert-box" style="display: none;"></div>
-
-            <!-- Check Status Button -->
-            <button type="button" id="btnGateCheckStatus" class="btn-gate-check">
+            <!-- Anti-Bypass Status Alert Box & Check Button (Hidden as flow auto-unlocks via /access) -->
+            <div id="gateBypassAlertBox" class="gate-bypass-alert-box" style="display: none !important;"></div>
+            <button type="button" id="btnGateCheckStatus" class="btn-gate-check" style="display: none !important;">
                 <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
                 <span>Check Verification Status</span>
             </button>
@@ -540,7 +538,7 @@
 
     <!-- Core Scripts -->
     <script src="js/lucide.min.js"></script>
-    <script src="js/app.js?v=20261111_linkvertise_v1"></script>
+    <script src="js/app.js?v=20261113_clean_v1"></script>
 </body>
 
 </html>

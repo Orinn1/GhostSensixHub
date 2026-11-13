@@ -1219,21 +1219,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 localStorage.setItem("ghostsensix_gate_click_time", String(Date.now()));
                 sessionStorage.setItem("ghostsensix_gate_clicked", "true");
                 sessionStorage.setItem("ghostsensix_gate_click_time", String(Date.now()));
-                
-                if (alertBox) {
-                    alertBox.className = "gate-bypass-alert-box state-waiting";
-                    alertBox.style.display = "block";
-                    alertBox.innerHTML = `
-                        <div style="font-weight: 600; color: #c084fc; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                            <span class="gate-spinner"></span>
-                            <span>Waiting for ${isLinkvertise ? 'Linkvertise' : isShrinkMe ? 'ShrinkMe' : 'LootLabs'} completion...</span>
-                        </div>
-                        <div style="font-size: 11.5px; color: #a79fc2; margin-top: 4px;">
-                            Complete tasks in the new tab (~20s), then return and click <b>"Check Verification Status"</b>
-                        </div>
-                    `;
-                    if (window.lucide && lucide.createIcons) lucide.createIcons();
-                }
             });
         }
 
