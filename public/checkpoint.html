@@ -3,349 +3,144 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GhostSensix &mdash; Anti-Bypass Security Checkpoint</title>
+  <meta name="monetag" content="006f5ad39e692eb6afe28008d13ae710">
+  <title>Unlock Free Scripts & Executor &mdash; Social Unlock Gateway</title>
+  
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Kanit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/gateflow/css/main.css?v=20261111_v1">
+  <link rel="stylesheet" href="/gateflow/css/locker.css?v=20261111_v1">
   <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    :root {
-      --bg: #080511;
-      --card-bg: rgba(18, 12, 36, 0.92);
-      --border: rgba(168, 85, 247, 0.25);
-      --primary: #a855f7;
-      --primary-glow: rgba(168, 85, 247, 0.4);
-      --cyan: #38bdf8;
-      --cyan-glow: rgba(56, 189, 248, 0.35);
-      --danger: #ef4444;
-      --danger-glow: rgba(239, 68, 68, 0.35);
-      --success: #10b981;
-      --success-glow: rgba(16, 185, 129, 0.35);
-      --text: #f5f2fc;
-      --text-muted: #a79fc2;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Plus Jakarta Sans', 'Kanit', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      position: relative;
-      overflow-x: hidden;
-      background-image: radial-gradient(circle at 50% 15%, rgba(168, 85, 247, 0.18) 0%, rgba(8, 5, 17, 0.98) 75%);
-    }
-    .checkpoint-container {
-      width: 100%;
-      max-width: 520px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 36px 30px;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 50px rgba(168, 85, 247, 0.2);
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-    .gateway-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 16px;
-      background: rgba(168, 85, 247, 0.12);
-      border: 1px solid rgba(168, 85, 247, 0.35);
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text);
-      letter-spacing: 0.5px;
-      margin-bottom: 22px;
-    }
-    .gateway-logo {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      margin: 0 auto 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.04);
-      border: 2px solid var(--border);
-      position: relative;
-      box-shadow: 0 0 30px var(--primary-glow);
-    }
-    .gateway-logo img {
-      width: 52px;
-      height: 52px;
-      object-fit: contain;
-    }
-    .gateway-logo.pulse-purple {
-      border-color: var(--primary);
-      box-shadow: 0 0 35px var(--primary-glow);
-    }
-    .gateway-logo.pulse-red {
-      border-color: var(--danger);
-      box-shadow: 0 0 35px var(--danger-glow);
-      background: rgba(239, 68, 68, 0.1);
-    }
-    .gateway-logo.pulse-green {
-      border-color: var(--success);
-      box-shadow: 0 0 35px var(--success-glow);
-      background: rgba(16, 185, 129, 0.1);
-    }
-    h1 {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      letter-spacing: -0.3px;
-    }
-    .desc {
-      font-size: 14px;
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 24px;
-    }
-    .session-badge {
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--cyan);
-      margin-bottom: 22px;
-      word-break: break-all;
-    }
-    .btn-action {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 14px 24px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.25s ease;
-      border: none;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%);
-      color: #fff;
-      box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
-    }
-    .btn-primary:hover {
-      box-shadow: 0 0 35px rgba(192, 132, 252, 0.8);
-      transform: translateY(-2px);
-    }
-    .btn-danger {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      color: #fff;
-      box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
-    }
-    .btn-danger:hover {
-      box-shadow: 0 0 35px rgba(239, 68, 68, 0.6);
-      transform: translateY(-2px);
-    }
-    .security-specs {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 24px;
-      padding-top: 18px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 12px;
-      color: #8c82a8;
-    }
-    .security-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-  </style>
 </head>
-<body>
+<body class="social-viewport">
 
-  <div class="checkpoint-container" id="mainCard">
-    <!-- State 1: Default / Checking -->
-    <div id="stateDefault">
-      <div class="gateway-badge">
-        <i data-lucide="shield-check" style="width: 14px; height: 14px; color: #a855f7;"></i>
-        Anti-Bypass Security Checkpoint
+  <!-- Ambient Blurred Blue Glow Spheres -->
+  <div class="bokeh-sphere sphere-top-left" aria-hidden="true"></div>
+  <div class="bokeh-sphere sphere-top-right" aria-hidden="true"></div>
+  <div class="bokeh-sphere sphere-bottom-left" aria-hidden="true"></div>
+  <div class="bokeh-sphere sphere-bottom-right" aria-hidden="true"></div>
+
+  <!-- Central Sub2Unlock Floating Card -->
+  <main class="social-card-wrapper">
+    <div class="social-modal-card">
+
+      <!-- Title & Subtitle -->
+      <h1 class="social-modal-title" id="lockerTitle">Unlock Free Access</h1>
+      <p class="social-modal-sub" id="lockerDesc">Complete the 4 support steps below to get instant 24-hour access</p>
+
+      <!-- Task Action Buttons (4 Tasks: YouTube + Like + Discord + 1 Sponsor 20s) -->
+      <div class="social-tasks-group">
+
+        <!-- Task 1: Subscribe on YouTube -->
+        <button type="button" class="btn-social-yt" id="btnTask1" onclick="handleTaskClick(1)">
+          <div class="yt-inner">
+            <svg class="yt-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/>
+              <path fill="#ffffff" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            <span id="txtTask1">Subscribe on YouTube (@GhostSensix)</span>
+          </div>
+          <i data-lucide="check" class="task-check-icon" id="checkTask1" style="display: none; width: 16px; height: 16px;"></i>
+        </button>
+
+        <!-- Task 2: Like Video -->
+        <button type="button" class="btn-social-yt" id="btnTask2" onclick="handleTaskClick(2)">
+          <div class="yt-inner">
+            <i data-lucide="thumbs-up" style="width: 17px; height: 17px;"></i>
+            <span id="txtTask2">Like Video</span>
+          </div>
+          <i data-lucide="check" class="task-check-icon" id="checkTask2" style="display: none; width: 16px; height: 16px;"></i>
+        </button>
+
+        <!-- Task 3: Join Discord Community -->
+        <button type="button" class="btn-social-dc" id="btnTask3" onclick="handleTaskClick(3)">
+          <div class="yt-inner">
+            <svg class="dc-svg-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+            </svg>
+            <span id="txtTask3">Join Discord Server</span>
+          </div>
+          <i data-lucide="check" class="task-check-icon" id="checkTask3" style="display: none; width: 16px; height: 16px;"></i>
+        </button>
+
+        <!-- Task 4: Sponsor Ad (Direct Link 20s) -->
+        <button type="button" class="btn-social-ad" id="btnTask4" onclick="handleTaskClick(4)">
+          <div class="yt-inner">
+            <i data-lucide="sparkles" style="width: 17px; height: 17px; color: #60a5fa;"></i>
+            <span id="txtTask4">Visit Sponsor (Wait 20s)</span>
+          </div>
+          <i data-lucide="check" class="task-check-icon" id="checkTask4" style="display: none; width: 16px; height: 16px;"></i>
+        </button>
+
       </div>
-      <div class="gateway-logo pulse-purple">
-        <img src="Logo.png" alt="GhostSensix">
+
+      <!-- Unlock Progress Track -->
+      <div class="social-progress-block">
+        <div class="social-progress-head">
+          <span class="lbl-unlock-progress" id="lblUnlockProgress">Unlock progress</span>
+          <span class="val-unlock-progress" id="txtProgressVal">0/4</span>
+        </div>
+        <div class="social-progress-track">
+          <div class="social-progress-bar" id="barProgressFill" style="width: 0%;"></div>
+        </div>
       </div>
-      <h1>Verifying Access Ticket...</h1>
-      <p class="desc">
-        Checking server-side cryptographic verification and LootLabs ad postback status.
-      </p>
-      <div class="session-badge" id="lblSession">Session: Checking...</div>
-      <button class="btn-action btn-primary" id="btnCheckStatus">
-        <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
-        Check Verification Status
+
+      <!-- Human Verification Card (LootLabs Style) -->
+      <div class="human-verify-card" id="humanVerifyCard" onclick="handleHumanVerifyClick()">
+        <div class="verify-left">
+          <div class="verify-chk" id="verifyChk">
+            <div class="verify-spinner" id="verifySpinner" style="display: none;"></div>
+            <i data-lucide="check" class="verify-check-icon" id="verifyCheckIcon" style="display: none; width: 16px; height: 16px;"></i>
+          </div>
+          <span class="verify-text" id="verifyText">Verify you are human</span>
+        </div>
+        <div class="verify-right">
+          <i data-lucide="shield-check" style="width: 18px; height: 18px; color: #3b82f6;"></i>
+          <span class="verify-brand">CloudShield</span>
+        </div>
+      </div>
+
+      <!-- Unlock Button -->
+      <button type="button" class="btn-social-unlock locked" id="btnUnlock" disabled onclick="handleUnlockClick()">
+        <i data-lucide="lock" id="iconUnlock" style="width: 15px; height: 15px;"></i>
+        <span id="txtUnlock">Enter Website ➔</span>
       </button>
-    </div>
 
-    <!-- State 2: Bypass Detected (RED) -->
-    <div id="stateBypass" style="display: none;">
-      <div class="gateway-badge" style="background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.35); color: var(--danger);">
-        <i data-lucide="shield-alert" style="width: 14px; height: 14px;"></i>
-        Bypass Attempt Blocked
-      </div>
-      <div class="gateway-logo pulse-red">
-        <i data-lucide="ban" style="width: 40px; height: 40px; color: var(--danger);"></i>
-      </div>
-      <h1 style="color: #fca5a5;">⛔ Bypass Attempt Detected!</h1>
-      <p class="desc" style="color: #cbd5e1;">
-        Automated bypass tools (e.g. Ixcore, Bypass.city) were detected on this session.<br>
-        <strong>LootLabs servers did NOT send verified ad completion postback. Access is strictly denied!</strong>
-      </p>
-      <div class="session-badge" style="color: #f87171; border-color: rgba(239, 68, 68, 0.25);" id="lblBypassSession">Session: Blocked</div>
-      <button class="btn-action btn-danger" onclick="window.location.href='/'">
-        <i data-lucide="rotate-ccw" style="width: 18px; height: 18px;"></i>
-        Complete Tasks Manually (Return to Hub)
-      </button>
-    </div>
+      <!-- Unlocked Script Result Box (Reveals directly inside card when script is unlocked) -->
+      <div class="social-script-result" id="scriptResultBox" style="display: none;">
+        <div class="script-box-header">
+          <div class="script-badge">
+            <i data-lucide="code" style="width: 13px; height: 13px;"></i>
+            <span>SCRIPT UNLOCKED</span>
+          </div>
+          <span class="script-status" id="scriptStatusText">Unlocked Successfully 🎉</span>
+        </div>
 
-    <!-- State 3: Verified Success (GREEN) -->
-    <div id="stateSuccess" style="display: none;">
-      <div class="gateway-badge" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.35); color: var(--success);">
-        <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
-        Verified &bull; Access Granted
-      </div>
-      <div class="gateway-logo pulse-green">
-        <i data-lucide="check" style="width: 40px; height: 40px; color: var(--success);"></i>
-      </div>
-      <h1 style="color: #86efac;">✅ Verification Successful!</h1>
-      <p class="desc" style="color: #cbd5e1;">
-        LootLabs Postback confirmed. You have been granted a 24-hour unlimited pass to GhostSensix Hub.
-      </p>
-      <div class="session-badge" style="color: #34d399; border-color: rgba(16, 185, 129, 0.25);" id="lblSuccessSession">Session: Verified</div>
-      <button class="btn-action btn-primary" onclick="window.location.href='/'" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-        <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
-        Enter GhostSensix Hub Now
-      </button>
-    </div>
+        <div class="script-code-wrap">
+          <pre><code id="scriptCodeText">-- Script loading...</code></pre>
+        </div>
 
-    <!-- Security Badges Footer -->
-    <div class="security-specs">
-      <div class="security-item">
-        <i data-lucide="cpu" style="width: 13px; height: 13px;"></i>
-        HMAC-SHA256
+        <button type="button" class="btn-copy-script" id="btnCopyScript" onclick="copyUnlockedScript()">
+          <i data-lucide="copy" id="iconCopyScript" style="width: 16px; height: 16px;"></i>
+          <span id="txtCopyScript">Copy Script 📋</span>
+        </button>
       </div>
-      <div class="security-item">
-        <i data-lucide="radio" style="width: 13px; height: 13px;"></i>
-        LootLabs Postback
-      </div>
-      <div class="security-item">
-        <i data-lucide="shield" style="width: 13px; height: 13px;"></i>
-        Zero-Bypass
-      </div>
-    </div>
-  </div>
 
+    </div>
+  </main>
+
+  <!-- Clean Floating Toast -->
+  <div id="toastContainer"></div>
+
+
+  <!-- Logic Scripts -->
+  <script src="/gateflow/js/locker.js?v=20261111_v1"></script>
   <script>
-    let currentSessionId = '';
-
-    function showBypassState(sessionId) {
-      document.getElementById('stateDefault').style.display = 'none';
-      document.getElementById('stateSuccess').style.display = 'none';
-      document.getElementById('stateBypass').style.display = 'block';
-      document.getElementById('lblBypassSession').textContent = 'Session: ' + (sessionId || 'Bypasser Detected') + ' (Blocked)';
-      lucide.createIcons();
-    }
-
-    function showSuccessState(sessionId) {
-      document.getElementById('stateDefault').style.display = 'none';
-      document.getElementById('stateBypass').style.display = 'none';
-      document.getElementById('stateSuccess').style.display = 'block';
-      document.getElementById('lblSuccessSession').textContent = 'Session: ' + (sessionId || 'Verified');
-      
-      const expiry = Date.now() + (24 * 60 * 60 * 1000);
-      localStorage.setItem('ghostsensix_gate_pass', String(expiry));
-      sessionStorage.setItem('ghostsensix_gate_pass', String(expiry));
-      lucide.createIcons();
-
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 1500);
-    }
-
-    async function checkStatus(retryCount = 0) {
-      const clickTime = parseInt(localStorage.getItem('ghostsensix_gate_click_time') || localStorage.getItem('blacklist_gate_click_time') || sessionStorage.getItem('ghostsensix_gate_click_time') || '0', 10);
-      const elapsed = clickTime > 0 ? (Date.now() - clickTime) / 1000 : 0;
-      const hasClicked = (localStorage.getItem('ghostsensix_gate_clicked') === 'true') || (sessionStorage.getItem('ghostsensix_gate_clicked') === 'true');
-
-      // 1. ShrinkMe Time-Window Verification
-      if (hasClicked && clickTime > 0) {
-        if (elapsed < 20) {
-          showBypassState(`Bypass Attempt: Arrived in only ${Math.round(elapsed)}s (Minimum 20s required for ShrinkMe tasks)`);
-          return;
-        } else {
-          showSuccessState('ShrinkMe Verified');
-          return;
-        }
-      }
-
-      // 2. LootLabs Server Postback verification
-      const params = new URLSearchParams(window.location.search);
-      const sess = params.get('session') || params.get('uid') || params.get('verify') || localStorage.getItem('ghostsensix_gate_session') || localStorage.getItem('ghostsensix_lootlabs_puid');
-      
-      if (sess) {
-        currentSessionId = sess;
-        try {
-          const res = await fetch(`/api/checkpoint/status?session=${encodeURIComponent(sess)}`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data && data.verified) {
-              showSuccessState(sess);
-              return;
-            }
-          }
-        } catch (e) {}
-
-        // Fallback check directly to Firestore
-        try {
-          const fbUrl = `https://firestore.googleapis.com/v1/projects/ghostsensi-1d96b/databases/(default)/documents/lootlabs_sessions/${encodeURIComponent(sess)}?key=AIzaSyBCMSULoP-CnTWurWMTUKDfRMEEu2T7PVE`;
-          const fbRes = await fetch(fbUrl);
-          if (fbRes.ok) {
-            const fbData = await fbRes.json();
-            if (fbData.fields && fbData.fields.verified && fbData.fields.verified.booleanValue === true) {
-              showSuccessState(sess);
-              return;
-            }
-          }
-        } catch (fbErr) {}
-
-        // Network latency buffer: LootLabs webhook might take 1-3 seconds to deliver
-        if (retryCount < 5) {
-          const lbl = document.getElementById('lblSession');
-          if (lbl) lbl.textContent = `Awaiting verification... (${5 - retryCount}s)`;
-          setTimeout(() => checkStatus(retryCount + 1), 1200);
-          return;
-        }
-      }
-
-      showBypassState(sess || 'No Active Session');
-    }
-
-    document.getElementById('btnCheckStatus').addEventListener('click', checkStatus);
-
-    document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      checkStatus();
-    });
+    lucide.createIcons();
   </script>
 </body>
 </html>
-

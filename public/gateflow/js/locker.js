@@ -245,8 +245,11 @@ document.addEventListener('DOMContentLoaded', () => {
     trackGateEvent(slug, 'click');
   }
 
+  const ref = document.referrer || '';
   if (params.get('hash')) {
     showToast('✅ Passed Linkvertise! Please complete the support steps below to enter the website.', 'success', 5000);
+  } else if (/loot-link|lootlabs|lootlinks|lootdest/i.test(ref) || params.get('session') || params.get('uid')) {
+    showToast('✅ LootLabs Verified! Complete the quick steps below to unlock the website.', 'success', 5000);
   }
 
   if (slug && slug !== 'hub-access') {
