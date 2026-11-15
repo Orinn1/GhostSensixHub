@@ -388,18 +388,16 @@ function isGhostSensixActive() {
   const params = new URLSearchParams(window.location.search);
   const ch = (params.get('ch') || params.get('yt') || currentLockerChannel || '').toLowerCase();
   const search = window.location.search.toLowerCase();
-  return ch.includes('ghost') || ch.includes('freefire') || search.includes('ghost') || search.includes('freefire');
+  const host = (window.location.hostname || '').toLowerCase();
+  const pathname = (window.location.pathname || '').toLowerCase();
+  return host.includes('ghost') || host.includes('sensix') || host.includes('pages.dev') || ch.includes('ghost') || ch.includes('freefire') || search.includes('ghost') || search.includes('freefire') || pathname.includes('ghost');
 }
 
 // Helper: Get Target YouTube Channel URL (with auto-subscribe popup)
 function getTargetYoutubeUrl() {
-  if (isGhostSensixActive()) {
-    return 'https://www.youtube.com/@GhostSensix?sub_confirmation=1';
-  }
-
   const params = new URLSearchParams(window.location.search);
   const customYt = params.get('yt') || params.get('ch') || currentLockerChannel;
-  if (customYt && customYt !== 'Blacklistxyx') {
+  if (customYt && customYt !== 'GhostSensix' && customYt !== 'Blacklistxyx') {
     let url = customYt.trim();
     if (!url.startsWith('http')) {
       url = `https://www.youtube.com/${url.startsWith('@') ? url : '@' + url}`;
@@ -407,7 +405,7 @@ function getTargetYoutubeUrl() {
     return url.includes('sub_confirmation') ? url : `${url}${url.includes('?') ? '&' : '?'}sub_confirmation=1`;
   }
 
-  return 'https://www.youtube.com/@Blacklistxyx?sub_confirmation=1';
+  return 'https://www.youtube.com/@GhostSensix?sub_confirmation=1';
 }
 
 // Auto-fetch latest YouTube video in the background via Worker API
@@ -419,9 +417,8 @@ async function fetchLatestVideo() {
     return;
   }
 
-  const isGhost = isGhostSensixActive();
   const customCh = params.get('ch') || params.get('yt') || currentLockerChannel || '';
-  const targetCh = isGhost ? 'GhostSensix' : (customCh ? customCh : 'Blacklistxyx');
+  const targetCh = customCh ? customCh : 'GhostSensix';
 
   try {
     const res = await fetch(`/api/latest-video?ch=${encodeURIComponent(targetCh)}`);
@@ -434,12 +431,8 @@ async function fetchLatestVideo() {
     }
   } catch (e) {}
 
-  // Fallback if API hasn't loaded or local dev
-  if (isGhost) {
-    cachedLatestVideoUrl = 'https://www.youtube.com/watch?v=HVPqCzVCnQk';
-  } else {
-    cachedLatestVideoUrl = 'https://www.youtube.com/watch?v=ClBmbJDIWzA';
-  }
+  // Fallback if API hasn't loaded or local dev (GhostSensix default)
+  cachedLatestVideoUrl = 'https://www.youtube.com/watch?v=HVPqCzVCnQk';
 }
 
 // Helper: Get Target YouTube Video URL (Auto resolved from YouTube channel)
@@ -448,21 +441,13 @@ function getTargetVideoUrl() {
   const customVideo = params.get('v') || params.get('video');
   if (customVideo) return customVideo;
 
-  if (isGhostSensixActive()) {
-    // For GhostSensix: strictly prevent any fallback to Blacklistxyx
-    if (cachedLatestVideoUrl && cachedLatestVideoUrl.includes('watch?v=')) {
-      if (!cachedLatestVideoUrl.includes('ClBmbJDIWzA')) {
-        return cachedLatestVideoUrl;
-      }
+  if (cachedLatestVideoUrl && cachedLatestVideoUrl.includes('watch?v=')) {
+    if (!cachedLatestVideoUrl.includes('ClBmbJDIWzA')) {
+      return cachedLatestVideoUrl;
     }
-    return 'https://www.youtube.com/watch?v=HVPqCzVCnQk';
   }
 
-  if (cachedLatestVideoUrl) {
-    return cachedLatestVideoUrl;
-  }
-
-  return 'https://www.youtube.com/watch?v=ClBmbJDIWzA';
+  return 'https://www.youtube.com/watch?v=HVPqCzVCnQk';
 }
 
 // 3. Handle Social Task Clicks (1-4)
