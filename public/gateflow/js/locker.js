@@ -15,7 +15,7 @@ const I18N = {
     gateTitle: 'ระบบยืนยันสิทธิ์ Security Access Gate',
     gateDesc: 'ทำภารกิจ 4 ขั้นตอนด้านล่างเพื่อรับสิทธิ์เข้าใช้งานเว็บฟรี 24 ชั่วโมง',
     task1: 'Subscribe on YouTube (กดติดตาม)',
-    task2: 'Like Video (กดไลค์คลิป)',
+    task2: 'Like Video & Comment on Video (กดไลค์ & คอมเมนต์คลิป)',
     task3: 'Join Discord Server (เข้าร่วมดิสคอร์ด)',
     task4: 'Visit Sponsor (ดูโฆษณาสปอนเซอร์ 20s)',
     verifying: 'กำลังตรวจสอบ...',
@@ -50,7 +50,7 @@ const I18N = {
     gateTitle: 'Security Verification Gate',
     gateDesc: 'Complete the 4 steps below to verify access for 24 hours',
     task1: 'Subscribe on YouTube',
-    task2: 'Like Video',
+    task2: 'Like Video & Comment on Video',
     task3: 'Join Discord Server',
     task4: 'Visit Sponsor (Wait 20s)',
     verifying: 'Verifying...',
@@ -154,6 +154,25 @@ const activeAdWindows = {};
 const activeTimers = {};
 let isHumanVerified = false;
 let isVerifyingHuman = false;
+let serverSessionTicket = '';
+
+// Initialize Server-Side Anti-Bypass Session Ticket (/api/gate/start)
+async function initGateAntiBypassSession() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const path = window.location.pathname.toLowerCase();
+    const slug = path.startsWith('/l/') ? path.slice(3).trim() : (params.get('slug') || (path === '/access' || path === '/hub' || path === '/gate' ? 'hub-access' : ''));
+    const res = await fetch(`/api/gate/start?slug=${encodeURIComponent(slug || 'hub-access')}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && data.ticket) {
+        serverSessionTicket = data.ticket;
+      }
+    }
+  } catch (err) {
+    console.warn('Anti-Bypass Session Start Warning:', err);
+  }
+}
 
 // LootLabs Human Verification Checkbox Handler
 window.handleHumanVerifyClick = function() {
@@ -234,6 +253,17 @@ document.addEventListener('DOMContentLoaded', () => {
   initDestinationUrl();
 
   const params = new URLSearchParams(window.location.search);
+
+  // ตรวจจับผู้ใช้ที่ผ่านด่านมาจาก LootLabs หรือ Linkvertise
+  const incomingHash = params.get('hash');
+  const ref = document.referrer || '';
+  if (incomingHash && incomingHash.length >= 32) {
+    showToast('✅ ผ่านด่าน Linkvertise สำเร็จ! กรุณาทำภารกิจสนับสนุนด้านล่างเพื่อเข้าสู่เว็บไซต์', 'success', 6000);
+  } else if (/loot-link|lootlabs|lootlinks|lootdest/i.test(ref) || params.get('session') || params.get('uid')) {
+    showToast('✅ ผ่านด่าน LootLabs สำเร็จ! ทำภารกิจสนับสนุนอีกนิดเพื่อเข้าสู่เว็บไซต์', 'success', 5000);
+  }
+
+  initGateAntiBypassSession();
   const path = window.location.pathname.toLowerCase();
   const slug = path.startsWith('/l/') ? path.slice(3).trim() : (params.get('slug') || (path === '/access' || path === '/hub' || path === '/gate' ? 'hub-access' : ''));
 
@@ -243,13 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (slug) {
     trackGateEvent(slug, 'click');
-  }
-
-  const ref = document.referrer || '';
-  if (params.get('hash')) {
-    showToast('✅ Passed Linkvertise! Please complete the support steps below to enter the website.', 'success', 5000);
-  } else if (/loot-link|lootlabs|lootlinks|lootdest/i.test(ref) || params.get('session') || params.get('uid')) {
-    showToast('✅ LootLabs Verified! Complete the quick steps below to unlock the website.', 'success', 5000);
   }
 
   if (slug && slug !== 'hub-access') {
@@ -362,14 +385,21 @@ function initDestinationUrl() {
 
 // Helper: Check if GhostSensix channel is active for this locker
 function isGhostSensixActive() {
-  return true; // Always GhostSensix
+  const params = new URLSearchParams(window.location.search);
+  const ch = (params.get('ch') || params.get('yt') || currentLockerChannel || '').toLowerCase();
+  const search = window.location.search.toLowerCase();
+  return ch.includes('ghost') || ch.includes('freefire') || search.includes('ghost') || search.includes('freefire');
 }
 
 // Helper: Get Target YouTube Channel URL (with auto-subscribe popup)
 function getTargetYoutubeUrl() {
+  if (isGhostSensixActive()) {
+    return 'https://www.youtube.com/@GhostSensix?sub_confirmation=1';
+  }
+
   const params = new URLSearchParams(window.location.search);
-  const customYt = params.get('yt') || params.get('ch');
-  if (customYt) {
+  const customYt = params.get('yt') || params.get('ch') || currentLockerChannel;
+  if (customYt && customYt !== 'Blacklistxyx') {
     let url = customYt.trim();
     if (!url.startsWith('http')) {
       url = `https://www.youtube.com/${url.startsWith('@') ? url : '@' + url}`;
@@ -377,10 +407,10 @@ function getTargetYoutubeUrl() {
     return url.includes('sub_confirmation') ? url : `${url}${url.includes('?') ? '&' : '?'}sub_confirmation=1`;
   }
 
-  return 'https://www.youtube.com/@GhostSensix?sub_confirmation=1';
+  return 'https://www.youtube.com/@Blacklistxyx?sub_confirmation=1';
 }
 
-// Auto-fetch latest YouTube video in real-time via Cloudflare Function or RSS feed
+// Auto-fetch latest YouTube video in the background via Worker API
 async function fetchLatestVideo() {
   const params = new URLSearchParams(window.location.search);
   const customVideo = params.get('v') || params.get('video');
@@ -389,50 +419,26 @@ async function fetchLatestVideo() {
     return;
   }
 
-  // 1. Check local session cache for instant load
-  try {
-    const cached = sessionStorage.getItem('ghost_latest_video_url');
-    if (cached && cached.includes('watch?v=')) {
-      cachedLatestVideoUrl = cached;
-    }
-  } catch (e) {}
+  const isGhost = isGhostSensixActive();
+  const customCh = params.get('ch') || params.get('yt') || currentLockerChannel || '';
+  const targetCh = isGhost ? 'GhostSensix' : (customCh ? customCh : 'Blacklistxyx');
 
-  const channelId = 'UC8laKzbaWUNJMJ6XN_pxiBg';
-
-  // 2. Tier 1: Try Cloudflare Pages Function / local backend endpoint
   try {
-    const res = await fetch('/api/latest-video', { signal: AbortSignal.timeout(3500) });
+    const res = await fetch(`/api/latest-video?ch=${encodeURIComponent(targetCh)}`);
     if (res.ok) {
       const data = await res.json();
-      if (data && data.videoUrl && data.videoUrl.includes('watch?v=')) {
+      if (data && data.videoUrl) {
         cachedLatestVideoUrl = data.videoUrl;
-        try { sessionStorage.setItem('ghost_latest_video_url', data.videoUrl); } catch (e) {}
         return;
       }
     }
   } catch (e) {}
 
-  // 3. Tier 2: Real-time public RSS-to-JSON gateway (always extracts latest upload automatically)
-  try {
-    const rssJsonUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(`https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`)}`;
-    const rssRes = await fetch(rssJsonUrl, { signal: AbortSignal.timeout(4500) });
-    if (rssRes.ok) {
-      const data = await rssRes.json();
-      if (data && data.status === 'ok' && Array.isArray(data.items) && data.items.length > 0) {
-        const latestItem = data.items[0];
-        const latestUrl = latestItem.link || (latestItem.guid ? `https://www.youtube.com/watch?v=${latestItem.guid.replace('yt:video:', '')}` : '');
-        if (latestUrl && latestUrl.includes('watch?v=')) {
-          cachedLatestVideoUrl = latestUrl;
-          try { sessionStorage.setItem('ghost_latest_video_url', latestUrl); } catch (e) {}
-          return;
-        }
-      }
-    }
-  } catch (e) {}
-
-  // 4. Fallback if offline
-  if (!cachedLatestVideoUrl) {
-    cachedLatestVideoUrl = 'https://www.youtube.com/watch?v=GTSVT1ax-jc';
+  // Fallback if API hasn't loaded or local dev
+  if (isGhost) {
+    cachedLatestVideoUrl = 'https://www.youtube.com/watch?v=HVPqCzVCnQk';
+  } else {
+    cachedLatestVideoUrl = 'https://www.youtube.com/watch?v=ClBmbJDIWzA';
   }
 }
 
@@ -442,11 +448,21 @@ function getTargetVideoUrl() {
   const customVideo = params.get('v') || params.get('video');
   if (customVideo) return customVideo;
 
-  if (cachedLatestVideoUrl && cachedLatestVideoUrl.includes('watch?v=') && !cachedLatestVideoUrl.includes('ClBmbJDIWzA')) {
+  if (isGhostSensixActive()) {
+    // For GhostSensix: strictly prevent any fallback to Blacklistxyx
+    if (cachedLatestVideoUrl && cachedLatestVideoUrl.includes('watch?v=')) {
+      if (!cachedLatestVideoUrl.includes('ClBmbJDIWzA')) {
+        return cachedLatestVideoUrl;
+      }
+    }
+    return 'https://www.youtube.com/watch?v=HVPqCzVCnQk';
+  }
+
+  if (cachedLatestVideoUrl) {
     return cachedLatestVideoUrl;
   }
 
-  return 'https://www.youtube.com/watch?v=GTSVT1ax-jc';
+  return 'https://www.youtube.com/watch?v=ClBmbJDIWzA';
 }
 
 // 3. Handle Social Task Clicks (1-4)
@@ -591,7 +607,7 @@ function updateProgressState() {
           txtUnlock.textContent = t('getScriptBtn');
         } else {
           const path = window.location.pathname.toLowerCase();
-          const isHub = true; // Always redirect with pass_token to unlock website
+          const isHub = path === '/access' || path === '/hub' || path === '/gate' || window.location.search.includes('hub-access') || destinationUrl === '/' || destinationUrl.includes('blacklisthub') || destinationUrl.includes('localhost');
           txtUnlock.textContent = isHub ? t('enterWebBtn') : t('unlockBtn');
         }
       }
@@ -668,15 +684,62 @@ window.handleUnlockClick = function() {
 
   // Otherwise, redirect to destinationUrl (e.g. MediaFire or main website)
   const path = window.location.pathname.toLowerCase();
-  const isHub = true; // Always redirect with pass_token to unlock GhostSensix 24h
+  const isHub = path === '/access' || path === '/hub' || path === '/gate' || window.location.search.includes('hub-access') || destinationUrl === '/' || destinationUrl.includes('blacklisthub') || destinationUrl.includes('localhost');
   const txtUnlock = document.getElementById('txtUnlock');
-  if (txtUnlock) txtUnlock.textContent = isHub ? t('redirectingHub') : t('redirecting');
+  const btnUnlock = document.getElementById('btnUnlock');
 
-  showToast(isHub ? `🚀 ${t('redirectingHub')}` : `🚀 ${t('redirecting')}`, 'success', 2000);
+  // Server-Side Anti-Bypass Verification (HMAC-SHA256 Token & Dwell Time)
+  if (isHub) {
+    if (btnUnlock) btnUnlock.disabled = true;
+    if (txtUnlock) txtUnlock.textContent = t('verifying');
 
+    (async () => {
+      try {
+        let passToken = '';
+        if (serverSessionTicket) {
+          const verifyRes = await fetch('/api/gate/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticket: serverSessionTicket })
+          });
+          const verifyData = await verifyRes.json();
+          if (!verifyData.success) {
+            if (btnUnlock) btnUnlock.disabled = false;
+            if (txtUnlock) txtUnlock.textContent = t('enterWebBtn');
+            showToast(verifyData.error || 'Anti-Bypass: คุณทำภารกิจไม่ครบเวลาที่กำหนด', 'error', 4500);
+            return;
+          }
+          passToken = verifyData.passToken;
+        }
+
+        grant24HourAccess();
+        if (passToken) {
+          localStorage.setItem('blackpass_token', passToken);
+          document.cookie = `blackpass_token=${passToken}; Path=/; Max-Age=86400; SameSite=Lax`;
+        }
+
+        showToast(`🚀 ${t('redirectingHub')}`, 'success', 2000);
+        setTimeout(() => {
+          const separator = destinationUrl.includes('?') ? '&' : '?';
+          const redirectUrl = passToken 
+            ? `${destinationUrl}${separator}pass_token=${encodeURIComponent(passToken)}`
+            : `${destinationUrl}${separator}pass_token=gateflow_24h`;
+          window.location.href = redirectUrl;
+        }, 600);
+      } catch (err) {
+        console.warn('Anti-Bypass verify offline fallback:', err);
+        grant24HourAccess();
+        window.location.href = destinationUrl;
+      }
+    })();
+    return;
+  }
+
+  // Regular external download / link redirect
+  if (txtUnlock) txtUnlock.textContent = t('redirecting');
+  showToast(`🚀 ${t('redirecting')}`, 'success', 2000);
   setTimeout(() => {
-    const separator = destinationUrl.includes('?') ? '&' : '?';
-    window.location.href = isHub ? `${destinationUrl}${separator}pass_token=gateflow_24h` : destinationUrl;
+    window.location.href = destinationUrl;
   }, 600);
 };
 
@@ -730,8 +793,6 @@ function triggerDirectAd(preferredIndex = 0) {
 function grant24HourAccess() {
   try {
     const expiry24h = Date.now() + (24 * 60 * 60 * 1000);
-    localStorage.setItem('ghostsensix_gate_pass', String(expiry24h));
-    sessionStorage.setItem('ghostsensix_gate_pass', String(expiry24h));
     localStorage.setItem('blacklist_lootlabs_auth_expiry', String(expiry24h));
     sessionStorage.setItem('blacklist_lootlabs_auth', 'true');
     localStorage.setItem('blacklist_lootlabs_unlocked_event', String(Date.now()));
